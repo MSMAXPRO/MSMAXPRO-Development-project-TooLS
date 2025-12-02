@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Neon Paint Studio</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        h2 { margin: 10px 0; color: #00e5ff; }
+
+        .toolbar {
+            background: #222;
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .color-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #555;
+            transition: transform 0.2s;
+        }
+
+        .color-btn:hover { transform: scale(1.2); }
+        .color-btn.active { border-color: white; box-shadow: 0 0 10px white; }
+
+        button#clear-btn {
+            background: #ff3d00;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        canvas {
+            background: #000;
+            border: 2px solid #333;
+            border-radius: 10px;
+            cursor: crosshair;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <h2>DIGITAL CANVAS</h2>
+    
+    <div class="toolbar">
+        <div class="color-btn active" style="background: #ffffff;" onclick="setColor(this, '#ffffff')"></div>
+        <div class="color-btn" style="background: #00e5ff;" onclick="setColor(this, '#00e5ff')"></div>
+        <div class="color-btn" style="background: #ff00ff;" onclick="setColor(this, '#ff00ff')"></div>
+        <div class="color-btn" style="background: #ffff00;" onclick="setColor(this, '#ffff00')"></div>
+        <div class="color-btn" style="background: #00ff00;" onclick="setColor(this, '#00ff00')"></div>
+        <button id="clear-btn" onclick="clearCanvas()">CLEAR</button>
+    </div>
+
+    <canvas id="drawing-board" width="800" height="500"></canvas>
+
+    <script>
+        const canvas = document.getElementById('drawing-board');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let currentColor = '#ffffff';
+
+        // Set initial canvas style
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = currentColor;
+
+        function startPosition(e) {
+            isDrawing = true;
+            draw(e);
+        }
+
+        function endPosition() {
+            isDrawing = false;
+            ctx.beginPath(); // Reset path so lines don't connect
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+
+            // Get mouse position relative to canvas
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            ctx.strokeStyle = currentColor;
+            ctx.shadowBlur = 10; // Neon glow effect
+            ctx.shadowColor = currentColor;
+
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        function setColor(elem, color) {
+            currentColor = color;
+            // Update active class UI
+            document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('active'));
+            elem.classList.add('active');
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Event Listeners
+        canvas.addEventListener('mousedown', startPosition);
+        canvas.addEventListener('mouseup', endPosition);
+        canvas.addEventListener('mousemove', draw);
+        
+        // Touch support for mobile
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevent scrolling
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent("mousedown", {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        });
+        
+        canvas.addEventListener('touchend', () => {
+            const mouseEvent = new MouseEvent("mouseup", {});
+            canvas.dispatchEvent(mouseEvent);
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent("mousemove", {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        });
+    </script>
+</body>
+</html>

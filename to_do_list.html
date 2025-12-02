@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Task Master</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #090909;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-y: auto;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #d8b4fe;
+            text-shadow: 0 0 10px #a855f7;
+            margin-bottom: 20px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            background: #1a1a1a;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #a855f7;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+        }
+
+        button#add-btn {
+            background: #a855f7;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        button#add-btn:hover {
+            background: #9333ea;
+            box-shadow: 0 0 15px #9333ea;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background: #1a1a1a;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-left: 4px solid #a855f7;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        li.completed {
+            text-decoration: line-through;
+            color: #555;
+            border-left-color: #555;
+            opacity: 0.7;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: 0.2s;
+        }
+
+        .check-btn { color: #4ade80; }
+        .check-btn:hover { text-shadow: 0 0 10px #4ade80; transform: scale(1.1); }
+
+        .trash-btn { color: #f87171; }
+        .trash-btn:hover { text-shadow: 0 0 10px #f87171; transform: scale(1.1); }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>NEON TASKS</h1>
+    
+    <div class="input-group">
+        <input type="text" id="taskInput" placeholder="Add a new mission...">
+        <button id="add-btn"><i class="fas fa-plus"></i></button>
+    </div>
+
+    <ul id="taskList">
+        <!-- Tasks will appear here -->
+    </ul>
+</div>
+
+<script>
+    const input = document.getElementById('taskInput');
+    const addBtn = document.getElementById('add-btn');
+    const list = document.getElementById('taskList');
+
+    // Add Task Function
+    function addTask() {
+        const text = input.value;
+        if (text === '') return;
+
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <span>${text}</span>
+            <div class="actions">
+                <button class="btn-action check-btn" onclick="toggleTask(this)"><i class="fas fa-check"></i></button>
+                <button class="btn-action trash-btn" onclick="deleteTask(this)"><i class="fas fa-trash"></i></button>
+            </div>
+        `;
+        
+        list.prepend(li); // Add to top
+        input.value = '';
+    }
+
+    // Event Listeners
+    addBtn.addEventListener('click', addTask);
+    
+    input.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') addTask();
+    });
+
+    // Toggle Complete
+    window.toggleTask = function(btn) {
+        const item = btn.closest('li');
+        item.classList.toggle('completed');
+    }
+
+    // Delete Task
+    window.deleteTask = function(btn) {
+        const item = btn.closest('li');
+        item.style.transform = 'translateX(50px)';
+        item.style.opacity = '0';
+        setTimeout(() => {
+            item.remove();
+        }, 300);
+    }
+</script>
+
+</body>
+</html>

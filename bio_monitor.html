@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bio-Metric Pulse Scanner</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; margin: 0; min-height: 100vh; }
+        
+        .monitor-frame {
+            position: relative; border: 2px solid #005500; margin-top: 20px; width: 320px; height: 240px; overflow: hidden;
+        }
+        
+        video { position: absolute; left: 0; top: 0; opacity: 0.8; filter: contrast(1.2) brightness(1.2); transform: scaleX(-1); }
+        
+        .overlay-roi {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 100px; height: 100px; border: 2px solid #0f0; box-shadow: 0 0 10px #0f0;
+            border-radius: 50%;
+        }
+
+        .graph-container {
+            width: 90%; max-width: 600px; height: 150px; background: #001100; border: 1px solid #003300; margin-top: 20px; position: relative;
+        }
+        
+        canvas { display: block; width: 100%; height: 100%; }
+
+        .stats {
+            display: flex; gap: 40px; margin-top: 20px; font-size: 2rem; font-weight: bold; text-shadow: 0 0 10px #0f0;
+        }
+        
+        .bpm-box { text-align: center; }
+        .bpm-label { font-size: 0.8rem; opacity: 0.7; display: block; }
+
+        .status { margin-top: 10px; color: #008800; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+
+    <h2 style="margin-bottom: 5px;">BIO-METRIC SCANNER</h2>
+    <div class="status" id="status">INITIALIZING SENSORS...</div>
+
+    <div class="monitor-frame">
+        <video id="video" width="320" height="240" autoplay muted playsinline></video>
+        <div class="overlay-roi"></div>
+    </div>
+
+    <div class="stats">
+        <div class="bpm-box">
+            <span id="bpm">--</span>
+            <span class="bpm-label">BPM (Live)</span>
+        </div>
+    </div>
+
+    <div class="graph-container">
+        <canvas id="graph"></canvas>
+    </div>
+
+    <p style="color: #005500; font-size: 0.8rem; text-align: center; max-width: 500px;">
+        INSTRUCTIONS: Place face in circle. Stay very still. Good lighting required.<br>
+        Calculating subtle blood-flow color changes...
+    </p>
+
+    <script>
+        const video = document.getElementById('video');
+        const graphCanvas = document.getElementById('graph');
+        const ctx = graphCanvas.getContext('2d');
+        const bpmDisplay = document.getElementById('bpm');
+        const statusDisplay = document.getElementById('status');
+        
+        // Settings
+        const ROI_SIZE = 50; // Region of Interest (Forehead)
+        const SAMPLE_BUFFER_SIZE = 150; // Keep last 150 frames
+        
+        let brightnessBuffer = [];
+        let times = [];
+        let canvasCtx = null;
+        let lastTime = Date.now();
+        let frameCount = 0;
+
+        // Start Camera
+        navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240, facingMode: 'user' } })
+            .then(stream => {
+                video.srcObject = stream;
+                statusDisplay.innerText = "SENSOR ACTIVE - ACQUIRING SIGNAL";
+                
+                // Create a hidden canvas to read pixels
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = 320;
+                tempCanvas.height = 240;
+                canvasCtx = tempCanvas.getContext('2d');
+                
+                requestAnimationFrame(processFrame);
+            })
+            .catch(err => {
+                statusDisplay.innerText = "CAMERA ACCESS DENIED";
+                statusDisplay.style.color = "red";
+            });
+
+        function processFrame() {
+            if (!canvasCtx) return;
+
+            // Draw video frame to hidden canvas
+            canvasCtx.drawImage(video, 0, 0, 320, 240);
+            
+            // Get center pixels (Green Channel is best for blood flow)
+            const frame = canvasCtx.getImageData((320/2)-(ROI_SIZE/2), (240/2)-(ROI_SIZE/2), ROI_SIZE, ROI_SIZE);
+            const data = frame.data;
+            
+            let avgGreen = 0;
+            for (let i = 0; i < data.length; i += 4) {
+                avgGreen += data[i + 1]; // Green channel
+            }
+            avgGreen /= (data.length / 4);
+
+            const now = Date.now();
+            brightnessBuffer.push(avgGreen);
+            times.push(now);
+            
+            if (brightnessBuffer.length > SAMPLE_BUFFER_SIZE) {
+                brightnessBuffer.shift();
+                times.shift();
+            }
+
+            drawGraph();
+            
+            // Calculate BPM every 30 frames
+            if (frameCount % 10 === 0 && brightnessBuffer.length > 60) {
+                calculateBPM();
+            }
+            
+            frameCount++;
+            requestAnimationFrame(processFrame);
+        }
+
+        function calculateBPM() {
+            // Signal Processing: Simple Peak Detection
+            // 1. Normalize
+            const min = Math.min(...brightnessBuffer);
+            const max = Math.max(...brightnessBuffer);
+            const normalized = brightnessBuffer.map(v => (v - min) / (max - min));
+            
+            // 2. Smooth (Moving Average)
+            const smoothed = [];
+            const windowSize = 5;
+            for(let i=0; i<normalized.length; i++) {
+                let sum = 0, count = 0;
+                for(let j=Math.max(0, i-windowSize); j<Math.min(normalized.length, i+windowSize); j++) {
+                    sum += normalized[j];
+                    count++;
+                }
+                smoothed.push(sum/count);
+            }
+
+            // 3. Count Peaks
+            let peaks = 0;
+            let lastPeakTime = 0;
+            let intervals = [];
+
+            for (let i = 1; i < smoothed.length - 1; i++) {
+                if (smoothed[i] > smoothed[i-1] && smoothed[i] > smoothed[i+1] && smoothed[i] > 0.5) {
+                    if (lastPeakTime > 0) {
+                        intervals.push(times[i] - lastPeakTime);
+                    }
+                    lastPeakTime = times[i];
+                    peaks++;
+                }
+            }
+            
+            if (intervals.length > 2) {
+                const avgInterval = intervals.reduce((a,b) => a+b, 0) / intervals.length;
+                const bpm = Math.round(60000 / avgInterval);
+                
+                if(bpm > 40 && bpm < 180) {
+                    bpmDisplay.innerText = bpm;
+                    statusDisplay.innerText = "PULSE DETECTED";
+                }
+            }
+        }
+
+        function drawGraph() {
+            graphCanvas.width = graphCanvas.offsetWidth;
+            graphCanvas.height = graphCanvas.offsetHeight;
+            
+            ctx.strokeStyle = '#00ff00';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            const min = Math.min(...brightnessBuffer);
+            const max = Math.max(...brightnessBuffer);
+            const range = max - min || 1;
+            
+            for (let i = 0; i < brightnessBuffer.length; i++) {
+                const x = (i / SAMPLE_BUFFER_SIZE) * graphCanvas.width;
+                const y = graphCanvas.height - ((brightnessBuffer[i] - min) / range) * graphCanvas.height;
+                
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Focus Timer</title>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .timer-card {
+            text-align: center;
+            position: relative;
+        }
+
+        /* SVG Circle Styles */
+        .circle-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+        }
+
+        circle {
+            fill: none;
+            stroke-width: 15;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .circle-bg {
+            stroke: #1e293b;
+        }
+
+        .circle-progress {
+            stroke: #3b82f6; /* Blue glow */
+            stroke-dasharray: 880; /* 2 * PI * r (approx) */
+            stroke-dashoffset: 0;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 10px #3b82f6);
+        }
+
+        .time-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn-start { background: #3b82f6; color: white; }
+        .btn-start:hover { box-shadow: 0 0 20px #3b82f6; }
+
+        .btn-reset { background: #ef4444; color: white; }
+        .btn-reset:hover { box-shadow: 0 0 20px #ef4444; }
+
+        .status {
+            margin-top: 20px;
+            color: #94a3b8;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="timer-card">
+        <h2 style="margin-bottom: 30px; color: #3b82f6;">FOCUS MODE</h2>
+        
+        <div class="circle-container">
+            <svg width="300" height="300">
+                <circle class="circle-bg" cx="150" cy="150" r="140"></circle>
+                <circle class="circle-progress" id="progress" cx="150" cy="150" r="140"></circle>
+            </svg>
+            <div class="time-display" id="time">25:00</div>
+        </div>
+
+        <div class="status" id="status-text">Ready to Focus?</div>
+
+        <div class="controls">
+            <button class="btn-start" onclick="toggleTimer()" id="startBtn">Start</button>
+            <button class="btn-reset" onclick="resetTimer()">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        let timeLeft = 25 * 60; // 25 minutes in seconds
+        let totalTime = 25 * 60;
+        let timerId = null;
+        let isRunning = false;
+
+        const timeDisplay = document.getElementById('time');
+        const progressCircle = document.getElementById('progress');
+        const startBtn = document.getElementById('startBtn');
+        const statusText = document.getElementById('status-text');
+        
+        // Circumference of circle with r=140 is approx 880
+        const circumference = 2 * Math.PI * 140;
+        progressCircle.style.strokeDasharray = circumference;
+
+        function updateDisplay() {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            timeDisplay.textContent = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+
+            // Update Circle Progress
+            let offset = circumference - (timeLeft / totalTime) * circumference;
+            progressCircle.style.strokeDashoffset = offset;
+        }
+
+        function toggleTimer() {
+            if (isRunning) {
+                clearInterval(timerId);
+                isRunning = false;
+                startBtn.textContent = "Resume";
+                statusText.textContent = "Paused";
+                startBtn.style.background = "#f59e0b"; // Orange
+            } else {
+                isRunning = true;
+                startBtn.textContent = "Pause";
+                statusText.textContent = "Focusing...";
+                startBtn.style.background = "#3b82f6"; // Blue
+                
+                timerId = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateDisplay();
+                    } else {
+                        clearInterval(timerId);
+                        isRunning = false;
+                        statusText.textContent = "Time's Up! Take a Break.";
+                        playSound();
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerId);
+            isRunning = false;
+            timeLeft = 25 * 60;
+            startBtn.textContent = "Start";
+            statusText.textContent = "Ready to Focus?";
+            startBtn.style.background = "#3b82f6";
+            updateDisplay();
+        }
+
+        function playSound() {
+            // Simple beep using AudioContext
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, ctx.currentTime);
+            osc.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.5);
+        }
+
+        updateDisplay();
+    </script>
+</body>
+</html>

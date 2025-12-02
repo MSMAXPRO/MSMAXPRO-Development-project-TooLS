@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Digital Clock</title>
+    <!-- Importing Digital Font from Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Setup the dark background */
+        body {
+            background-color: #050505; /* Almost black */
+            color: #ffffff;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Orbitron', sans-serif; /* Digital font */
+            overflow: hidden;
+        }
+
+        /* Container for the clock */
+        .clock-container {
+            text-align: center;
+            border: 3px solid #1a1a1a;
+            padding: 40px 60px;
+            border-radius: 20px;
+            background: #0a0a0a;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+            /* Subtle reflection effect */
+            position: relative;
+        }
+
+        /* The Main Time Display */
+        .time {
+            font-size: 5rem; /* Very big text */
+            font-weight: 700;
+            letter-spacing: 5px;
+            color: #fff;
+            
+            /* THE NEON MAGIC - Multiple text shadows create the glow */
+            text-shadow: 
+                0 0 10px #00f3ff,
+                0 0 20px #00f3ff,
+                0 0 40px #00f3ff,
+                0 0 80px #00f3ff;
+        }
+
+        /* The AM/PM indicator */
+        .session {
+            font-size: 1.5rem;
+            vertical-align: top;
+            margin-left: 10px;
+            color: #00f3ff;
+            text-shadow: 0 0 10px #00f3ff;
+        }
+
+        /* Date Display below time */
+        .date {
+            margin-top: 10px;
+            font-size: 1.2rem;
+            color: #aaa;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        /* Blinking colon animation */
+        .colon {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 600px) {
+            .time { font-size: 2.5rem; }
+            .clock-container { padding: 20px; width: 80%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="clock-container">
+        <div class="time" id="digital-clock">
+            12<span class="colon">:</span>00<span class="colon">:</span>00 <span class="session" id="session">AM</span>
+        </div>
+        <div class="date" id="date-display">
+            Loading Date...
+        </div>
+    </div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            
+            let h = now.getHours();
+            let m = now.getMinutes();
+            let s = now.getSeconds();
+            let session = "AM";
+
+            // Logic to convert 24-hour format to 12-hour format
+            if (h == 0) {
+                h = 12;
+            }
+            if (h > 12) {
+                h = h - 12;
+                session = "PM";
+            }
+
+            // Logic to add '0' before single digit numbers (e.g., 9 becomes 09)
+            h = (h < 10) ? "0" + h : h;
+            m = (m < 10) ? "0" + m : m;
+            s = (s < 10) ? "0" + s : s;
+
+            // Update Time HTML
+            const timeHTML = `${h}<span class="colon">:</span>${m}<span class="colon">:</span>${s} <span class="session">${session}</span>`;
+            document.getElementById("digital-clock").innerHTML = timeHTML;
+
+            // Update Date
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateString = now.toLocaleDateString('en-US', options);
+            document.getElementById("date-display").textContent = dateString;
+        }
+
+        // Run the function immediately so we don't wait 1 second for the clock to appear
+        updateClock();
+
+        // Update the clock every 1000 milliseconds (1 second)
+        setInterval(updateClock, 1000);
+    </script>
+
+</body>
+</html>

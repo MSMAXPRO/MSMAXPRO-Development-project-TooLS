@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Neon Drum Kit</title>
+    <style>
+        body {
+            background: #121212;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: sans-serif;
+        }
+
+        .keys {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .key {
+            border: 4px solid #333;
+            border-radius: 10px;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,0.5);
+            transition: 0.1s;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .playing {
+            transform: scale(1.1);
+            border-color: #ff00ff;
+            box-shadow: 0 0 20px #ff00ff;
+        }
+
+        kbd {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .sound-name {
+            font-size: 0.7rem;
+            color: #ff00ff;
+            text-transform: uppercase;
+        }
+        
+        h1 {
+            position: absolute;
+            top: 20px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Press Keys to Play</h1>
+
+    <div class="keys">
+        <div data-key="65" class="key"><kbd>A</kbd><span class="sound-name">Kick</span></div>
+        <div data-key="83" class="key"><kbd>S</kbd><span class="sound-name">Snare</span></div>
+        <div data-key="68" class="key"><kbd>D</kbd><span class="sound-name">Hi-Hat</span></div>
+        <div data-key="70" class="key"><kbd>F</kbd><span class="sound-name">Tom 1</span></div>
+        <div data-key="71" class="key"><kbd>G</kbd><span class="sound-name">Tom 2</span></div>
+        <div data-key="72" class="key"><kbd>H</kbd><span class="sound-name">Clap</span></div>
+        <div data-key="74" class="key"><kbd>J</kbd><span class="sound-name">Ride</span></div>
+        <div data-key="75" class="key"><kbd>K</kbd><span class="sound-name">Crash</span></div>
+    </div>
+
+    <script>
+        // Synthesizer logic to create sounds without external MP3s
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playTone(freq, type, duration) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            
+            gain.gain.setValueAtTime(0.5, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + duration);
+        }
+
+        function playNoise(duration) {
+            const bufferSize = ctx.sampleRate * duration;
+            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+            const noise = ctx.createBufferSource();
+            noise.buffer = buffer;
+            const gain = ctx.createGain();
+            gain.gain.setValueAtTime(0.5, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+            noise.connect(gain);
+            gain.connect(ctx.destination);
+            noise.start();
+        }
+
+        function playSound(keyCode) {
+            switch(keyCode) {
+                case 65: // Kick
+                    playTone(60, 'sine', 0.5);
+                    break;
+                case 83: // Snare
+                    playTone(200, 'triangle', 0.1);
+                    playNoise(0.2);
+                    break;
+                case 68: // Hi-Hat
+                    playNoise(0.05);
+                    break;
+                case 70: // Tom 1
+                    playTone(150, 'sine', 0.3);
+                    break;
+                case 71: // Tom 2
+                    playTone(100, 'sine', 0.3);
+                    break;
+                case 72: // Clap
+                    playNoise(0.1);
+                    break;
+                case 74: // Ride
+                    playTone(800, 'square', 0.5);
+                    break;
+                case 75: // Crash
+                    playNoise(0.8);
+                    break;
+            }
+        }
+
+        function handleKey(e) {
+            const key = document.querySelector(`.key[data-key="${e.keyCode}"]`);
+            if (!key) return;
+            
+            key.classList.add('playing');
+            playSound(e.keyCode);
+            
+            setTimeout(() => key.classList.remove('playing'), 100);
+        }
+
+        window.addEventListener('keydown', handleKey);
+    </script>
+</body>
+</html>

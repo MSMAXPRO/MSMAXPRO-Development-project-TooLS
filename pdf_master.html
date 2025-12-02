@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Local PDF Master</title>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <style>
+        body { background: #525659; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; color: white; }
+        .header { margin: 20px; text-align: center; }
+        .container { width: 600px; background: #323639; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        
+        .drop-zone {
+            border: 2px dashed #777; padding: 40px; text-align: center; border-radius: 5px; cursor: pointer; transition: 0.3s; background: #2a2d30;
+        }
+        .drop-zone:hover { border-color: #ff4757; background: #3a3d40; }
+        
+        .file-list { margin-top: 20px; list-style: none; padding: 0; }
+        .file-item {
+            background: #444; padding: 10px; margin-bottom: 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .file-name { font-size: 0.9rem; max-width: 400px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        
+        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
+        .btn-remove { background: #ff4757; font-size: 0.8rem; }
+        .btn-action { background: #2ed573; width: 100%; font-size: 1.1rem; padding: 15px; margin-top: 20px; }
+        .btn-action:hover { background: #26af61; }
+        .btn-action:disabled { background: #555; cursor: not-allowed; }
+
+        .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; display: none; margin-left: 10px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>📑 PDF Master</h1>
+        <p style="color: #bbb;">Merge PDFs securely. No server upload.</p>
+    </div>
+
+    <div class="container">
+        <div class="drop-zone" onclick="document.getElementById('fileIn').click()">
+            <h3>Click to Select PDFs</h3>
+            <p style="color:#888">or Drag & Drop here</p>
+            <input type="file" id="fileIn" accept="application/pdf" multiple style="display: none">
+        </div>
+
+        <ul class="file-list" id="fileList"></ul>
+
+        <button class="btn btn-action" id="mergeBtn" onclick="mergePDFs()" disabled>
+            MERGE PDFS <div class="spinner" id="spinner"></div>
+        </button>
+    </div>
+
+    <script>
+        const fileIn = document.getElementById('fileIn');
+        const fileList = document.getElementById('fileList');
+        const mergeBtn = document.getElementById('mergeBtn');
+        let filesArray = [];
+
+        fileIn.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        // Drag and Drop Logic
+        const dropZone = document.querySelector('.drop-zone');
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#ff4757'; });
+        dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.style.borderColor = '#777'; });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#777';
+            handleFiles(e.dataTransfer.files);
+        });
+
+        async function handleFiles(files) {
+            for (let file of files) {
+                if (file.type === 'application/pdf') {
+                    // Convert file to ArrayBuffer immediately for processing later
+                    const arrayBuffer = await file.arrayBuffer();
+                    filesArray.push({ name: file.name, data: arrayBuffer });
+                }
+            }
+            renderList();
+        }
+
+        function renderList() {
+            fileList.innerHTML = '';
+            filesArray.forEach((file, index) => {
+                const li = document.createElement('li');
+                li.className = 'file-item';
+                li.innerHTML = `
+                    <span class="file-name">📄 ${file.name}</span>
+                    <button class="btn btn-remove" onclick="removeFile(${index})">✕</button>
+                `;
+                fileList.appendChild(li);
+            });
+            mergeBtn.disabled = filesArray.length < 2;
+            mergeBtn.innerHTML = filesArray.length < 2 ? "Select at least 2 PDFs" : "MERGE PDFS";
+        }
+
+        function removeFile(index) {
+            filesArray.splice(index, 1);
+            renderList();
+        }
+
+        async function mergePDFs() {
+            const spinner = document.createElement('div');
+            spinner.className = 'spinner';
+            spinner.style.display = 'inline-block';
+            mergeBtn.innerHTML = "Processing...";
+            mergeBtn.appendChild(spinner);
+            mergeBtn.disabled = true;
+
+            try {
+                const { PDFDocument } = PDFLib;
+                const mergedPdf = await PDFDocument.create();
+
+                for (let fileObj of filesArray) {
+                    const pdf = await PDFDocument.load(fileObj.data);
+                    const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                    copiedPages.forEach((page) => mergedPdf.addPage(page));
+                }
+
+                const pdfBytes = await mergedPdf.save();
+                download(pdfBytes, "merged_document.pdf", "application/pdf");
+                
+                mergeBtn.innerHTML = "Success! Downloading...";
+                setTimeout(() => { renderList(); }, 2000);
+            } catch (err) {
+                alert("Error merging PDFs: " + err);
+                renderList();
+            }
+        }
+
+        function download(data, filename, type) {
+            const blob = new Blob([data], { type: type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>

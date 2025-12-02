@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gravity Sandbox</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #111; font-family: sans-serif; }
+        canvas { display: block; }
+        .instructions {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #ccc;
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+        h2 { margin: 0 0 5px 0; color: #ffeb3b; }
+    </style>
+</head>
+<body>
+
+<div class="instructions">
+    <h2>PHYSICS SANDBOX</h2>
+    <p>Left Click: Spawn Balls</p>
+    <p>Right Click: Anti-Gravity Blast</p>
+    <p>Balls: <span id="count">0</span></p>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const countEl = document.getElementById('count');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let particles = [];
+    const friction = 0.95; // Energy loss on bounce
+    const gravity = 0.6;
+
+    class Particle {
+        constructor(x, y, radius, color, velocity) {
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+            this.color = color;
+            this.velocity = velocity;
+            this.mass = 1;
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+            ctx.fillStyle = this.color;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = this.color;
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        update() {
+            // Check Floor Collision
+            if (this.y + this.radius + this.velocity.y > canvas.height) {
+                this.velocity.y = -this.velocity.y * friction;
+            } else {
+                this.velocity.y += gravity;
+            }
+
+            // Check Wall Collision
+            if (this.x + this.radius + this.velocity.x > canvas.width || this.x - this.radius <= 0) {
+                this.velocity.x = -this.velocity.x * friction;
+            }
+
+            this.x += this.velocity.x;
+            this.y += this.velocity.y;
+
+            this.draw();
+        }
+    }
+
+    function init() {
+        animate();
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        // Clear screen with trail effect
+        ctx.fillStyle = 'rgba(17, 17, 17, 0.4)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach(particle => {
+            particle.update();
+        });
+        
+        countEl.textContent = particles.length;
+    }
+
+    // Spawn on Click
+    window.addEventListener('mousedown', (e) => {
+        if (e.button === 0) { // Left Click
+            const radius = Math.random() * 10 + 5;
+            const color = `hsl(${Math.random() * 360}, 50%, 50%)`;
+            const velocity = {
+                x: (Math.random() - 0.5) * 15,
+                y: (Math.random() - 0.5) * 15
+            };
+            particles.push(new Particle(e.clientX, e.clientY, radius, color, velocity));
+        } else if (e.button === 2) { // Right Click
+            // Blast Effect
+            particles.forEach(p => {
+                p.velocity.y -= 20;
+                p.velocity.x += (Math.random() - 0.5) * 20;
+            });
+        }
+    });
+
+    // Disable context menu for right click
+    window.addEventListener('contextmenu', e => e.preventDefault());
+
+    // Resize
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+
+    init();
+</script>
+</body>
+</html>

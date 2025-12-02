@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Secret Lab</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --primary: #00ffcc; --bg: #0f172a; --card: #1e293b; }
+        body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
+
+        /* --- LOCK SCREEN --- */
+        #lock-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 9999; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; transition: top 0.5s ease-in-out;
+        }
+        
+        .pin-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; }
+        .pin-btn {
+            width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--primary);
+            background: transparent; color: var(--primary); font-size: 1.5rem; cursor: pointer;
+            transition: 0.2s;
+        }
+        .pin-btn:hover { background: var(--primary); color: black; }
+        
+        .pin-display {
+            width: 300px; height: 50px; background: #111; border: 1px solid #333;
+            color: var(--primary); font-size: 1.5rem; text-align: center; letter-spacing: 5px;
+            margin-bottom: 20px; border-radius: 10px; line-height: 50px;
+            overflow: hidden;
+        }
+        
+        .error-anim { animation: shake 0.5s; border-color: red; color: red; }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } 100% { transform: translateX(0); } }
+
+        /* --- DASHBOARD --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; display: none; animation: fadeIn 1s; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid #333; padding-bottom: 20px; }
+        h1 { margin: 0; background: linear-gradient(to right, #00ffcc, #0088ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .section-title { color: #64748b; margin: 40px 0 20px; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 1px solid #334155; padding-bottom: 5px; display: inline-block; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        
+        .card {
+            background: var(--card); border-radius: 15px; padding: 20px; text-align: center;
+            transition: 0.3s; border: 1px solid #334155; position: relative; overflow: hidden;
+            cursor: pointer; text-decoration: none; color: white; display: block;
+        }
+        .card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 0 20px rgba(0, 255, 204, 0.2); }
+        
+        .icon-box {
+            width: 50px; height: 50px; background: rgba(255, 255, 255, 0.05); border-radius: 12px;
+            display: flex; justify-content: center; align-items: center; margin: 0 auto 15px;
+            font-size: 1.5rem; color: var(--primary);
+        }
+        
+        .card h3 { margin: 10px 0 5px; font-size: 1rem; }
+        .card p { font-size: 0.75rem; color: #94a3b8; margin: 0; }
+        
+        .badge {
+            position: absolute; top: 10px; right: 10px; background: #e11d48; color: white;
+            font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; font-weight: bold;
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <!-- LOCK SCREEN -->
+    <div id="lock-screen">
+        <h2 style="color: var(--primary); letter-spacing: 2px;">SECURE LAB ACCESS</h2>
+        <div class="pin-display" id="pinDisplay"></div>
+        <div class="pin-pad">
+            <button class="pin-btn" onclick="enterDigit(1)">1</button>
+            <button class="pin-btn" onclick="enterDigit(2)">2</button>
+            <button class="pin-btn" onclick="enterDigit(3)">3</button>
+            <button class="pin-btn" onclick="enterDigit(4)">4</button>
+            <button class="pin-btn" onclick="enterDigit(5)">5</button>
+            <button class="pin-btn" onclick="enterDigit(6)">6</button>
+            <button class="pin-btn" onclick="enterDigit(7)">7</button>
+            <button class="pin-btn" onclick="enterDigit(8)">8</button>
+            <button class="pin-btn" onclick="enterDigit(9)">9</button>
+            <button class="pin-btn" onclick="clearPin()" style="color: #ef4444;">C</button>
+            <button class="pin-btn" onclick="enterDigit(0)">0</button>
+            <button class="pin-btn" onclick="checkPin()" style="color: #10b981;">></button>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div class="container" id="dashboard">
+        <header>
+            <h1><i class="fas fa-microchip"></i> My Secret Lab</h1>
+            <button onclick="lock()" style="background: none; border: 1px solid #333; color: white; padding: 5px 15px; border-radius: 20px; cursor: pointer;">Lock</button>
+        </header>
+
+        <!-- GOD LEVEL / AI TOOLS -->
+        <div class="section-title">Impossible / AI Projects</div>
+        <div class="grid">
+            <a href="jarvis_ai.html" class="card" target="_blank">
+                <span class="badge">AI</span>
+                <div class="icon-box"><i class="fas fa-robot"></i></div>
+                <h3>J.A.R.V.I.S.</h3>
+                <p>AI Vision HUD</p>
+            </a>
+            <a href="ghost_touch.html" class="card" target="_blank">
+                <span class="badge">NEW</span>
+                <div class="icon-box"><i class="fas fa-hand-sparkles"></i></div>
+                <h3>Ghost Touch</h3>
+                <p>Air Gestures</p>
+            </a>
+            <a href="motion_cam.html" class="card" target="_blank">
+                <div class="icon-box"><i class="fas fa-video"></i></div>
+                <h3>Motion Cam</h3>
+                <p>Sentry Mode</p>
+            </a>
+            <a href="bio_monitor.html" class="card" target="_blank">
+                <div class="icon-box"><i class="fas fa-heartbeat"></i></div>
+                <h3>Bio Monitor</h3>
+                <p>Heart Rate Scanner</p>
+            </a>
+            <a href="patfinding_visualizer.html" class="card" target="_blank">
+                <div class="icon-box"><i class="fas fa-route"></i></div>
+                <h3>Pathfinding</h3>
+                <p>AI Logic Visualizer</p>
+            </a>
+            <a href="physics_sandbox.html" class="card" target="_blank">
+                <div class="icon-box"><i class="fas fa-atom"></i></div>
+                <h3>Physics Box</h3>
+                <p>Gravity Engine</p>
+            </a>
+        </div>
+
+        <!-- UTILITY TOOLS -->
+        <div class="section-title">Secret Utilities</div>
+        <div class="grid">
+            <a href="secure_password_vault.html" class="card" target="_blank">
+                <div class="icon-box"><i class="fas fa-key"></i></div>
+                <h3>Secure Vault</h3>
+                <p>Password Manager</p>
+            </a>
+            <a href="image_text_copy.html" class="card" target="_blank">
+                <div class="icon-box"><i class="fas fa-eye"></i></div>
+                <h3>OCR Scanner</h3>
+                <p>Image to Text</p>
+            </a>
+            <a href="pdf_master.html" class="card" target="_blank">
+                <div class="icon-box"><i class="fas fa-file-pdf"></i></div>
+                <h3>PDF Master</h3>
+                <p>Merge & Edit</p>
+            </a>
+            <a href="expanse_tracker.html" class="card" target="_blank">
+                <div class="icon-box"><i class="fas fa-wallet"></i></div>
+                <h3>Expense Tracker</h3>
+                <p>Budget Manager</p>
+            </a>
+            <a href="focus_timer.html" class="card" target="_blank">
+                <div class="icon-box"><i class="fas fa-clock"></i></div>
+                <h3>Focus Timer</h3>
+                <p>Pomodoro</p>
+            </a>
+            <a href="to_do_list.html" class="card" target="_blank">
+                <div class="icon-box"><i class="fas fa-check-double"></i></div>
+                <h3>To-Do List</h3>
+                <p>Task Manager</p>
+            </a>
+        </div>
+
+        <!-- COOL & FUN TOOLS -->
+        <div class="section-title">Creative & Fun</div>
+        <div class="grid">
+            <a href="digital_canvas.html" class="card" target="_blank">
+                <div class="icon-box"><i class="fas fa-paint-brush"></i></div>
+                <h3>Digital Canvas</h3>
+                <p>Paint App</p>
+            </a>
+            <a href="neon_digital_clock..html" class="card" target="_blank">
+                <div class="icon-box"><i class="fas fa-clock"></i></div>
+                <h3>Neon Clock</h3>
+                <p>Digital Time</p>
+            </a>
+            <a href="virtual drum_kit.html" class="card" target="_blank">
+                <div class="icon-box"><i class="fas fa-drum"></i></div>
+                <h3>Drum Kit</h3>
+                <p>Virtual Instruments</p>
+            </a>
+            <a href="text_to_speech.html" class="card" target="_blank">
+                <div class="icon-box"><i class="fas fa-volume-up"></i></div>
+                <h3>Text to Speech</h3>
+                <p>Voice Reader</p>
+            </a>
+            <a href="typing speed check.html" class="card" target="_blank">
+                <div class="icon-box"><i class="fas fa-keyboard"></i></div>
+                <h3>Speed Type</h3>
+                <p>WPM Tester</p>
+            </a>
+        </div>
+
+        <!-- CLASSIC TOOLS -->
+        <div class="section-title">Classics</div>
+        <div class="grid">
+            <a href="calculator.html" class="card" target="_blank">
+                <div class="icon-box"><i class="fas fa-calculator"></i></div>
+                <h3>Calculator</h3>
+                <p>Standard Calc</p>
+            </a>
+            <a href="bmi_calculator.html" class="card" target="_blank">
+                <div class="icon-box"><i class="fas fa-weight"></i></div>
+                <h3>BMI Calc</h3>
+                <p>Health Check</p>
+            </a>
+            <a href="analog_clock.html" class="card" target="_blank">
+                <div class="icon-box"><i class="far fa-clock"></i></div>
+                <h3>Analog Clock</h3>
+                <p>Classic Time</p>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // ======================================================
+        //     👇 APNA 10-DIGIT SECRET PIN YAHAN SET KAREIN 👇
+        // ======================================================
+        
+        const SECRET_PIN = "1234567890";  // Change this!
+        
+        // ======================================================
+
+        let currentPin = "";
+        const pinDisplay = document.getElementById('pinDisplay');
+        const lockScreen = document.getElementById('lock-screen');
+        const dashboard = document.getElementById('dashboard');
+
+        function enterDigit(digit) {
+            if (currentPin.length < 10) {
+                currentPin += digit;
+                updateDisplay();
+            }
+        }
+
+        function updateDisplay() {
+            pinDisplay.innerText = "*".repeat(currentPin.length);
+        }
+
+        function clearPin() {
+            currentPin = "";
+            updateDisplay();
+            pinDisplay.classList.remove('error-anim');
+        }
+
+        function checkPin() {
+            if (currentPin === SECRET_PIN) {
+                unlock();
+            } else {
+                pinDisplay.classList.add('error-anim');
+                pinDisplay.innerText = "ERROR";
+                setTimeout(() => {
+                    clearPin();
+                }, 500);
+            }
+        }
+
+        function unlock() {
+            lockScreen.style.top = "-100%";
+            dashboard.style.display = "block";
+            localStorage.setItem('lab_unlocked', 'true');
+        }
+
+        function lock() {
+            lockScreen.style.top = "0";
+            dashboard.style.display = "none";
+            currentPin = "";
+            updateDisplay();
+            localStorage.removeItem('lab_unlocked');
+        }
+    </script>
+</body>
+</html>

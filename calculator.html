@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSMAXPRO Calculator 2.0</title>
+    <style>
+        /* General Styling for Premium Look */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .calculator-card {
+            background-color: #1e1e1e;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        h1 {
+            color: #00e5ff; /* Cyan color for title */
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #2d2d2d;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #00e5ff;
+        }
+
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+            font-weight: bold;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .btn-op {
+            background-color: #333;
+            color: #00e5ff;
+        }
+
+        .btn-op:hover {
+            background-color: #444;
+        }
+
+        .btn-clear {
+            grid-column: span 2;
+            background-color: #ff3d00; /* Red for clear */
+            color: white;
+            margin-top: 10px;
+        }
+
+        .btn-clear:hover {
+            background-color: #ff6333;
+        }
+
+        #result-area {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #000;
+            border-radius: 8px;
+            border: 1px solid #333;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .result-label {
+            color: #666;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            color: #00e5ff;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #ff3d00;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator-card">
+        <h1>MSMAXPRO Calc 2.0</h1>
+
+        <div class="input-group">
+            <label for="num1">First Number:</label>
+            <input type="number" id="num1" placeholder="Enter number...">
+        </div>
+
+        <div class="input-group">
+            <label for="num2">Second Number:</label>
+            <input type="number" id="num2" placeholder="Enter number...">
+        </div>
+
+        <div class="buttons-grid">
+            <button class="btn-op" onclick="calculate('+')">+</button>
+            <button class="btn-op" onclick="calculate('-')">−</button>
+            <button class="btn-op" onclick="calculate('*')">×</button>
+            <button class="btn-op" onclick="calculate('/')">÷</button>
+            
+            <button class="btn-clear" onclick="clearFields()">Clear / Reset</button>
+        </div>
+
+        <div id="result-area">
+            <span class="result-label">RESULT</span>
+            <span id="result-value" class="result-value">---</span>
+        </div>
+    </div>
+
+    <script>
+        function calculate(operation) {
+            // Get values from inputs
+            const n1Input = document.getElementById('num1').value;
+            const n2Input = document.getElementById('num2').value;
+            const resultDisplay = document.getElementById('result-value');
+
+            // Validation: Check if inputs are empty
+            if (n1Input === '' || n2Input === '') {
+                resultDisplay.innerHTML = '<span class="error">Please enter both numbers</span>';
+                return;
+            }
+
+            // Convert string inputs to floats (numbers)
+            const num1 = parseFloat(n1Input);
+            const num2 = parseFloat(n2Input);
+            let result = 0;
+
+            // Math Logic (Switch Case similar to Python Match)
+            switch (operation) {
+                case '+':
+                    result = num1 + num2;
+                    break;
+                case '-':
+                    result = num1 - num2;
+                    break;
+                case '*':
+                    result = num1 * num2;
+                    break;
+                case '/':
+                    if (num2 === 0) {
+                        resultDisplay.innerHTML = '<span class="error">Cannot divide by Zero!</span>';
+                        return;
+                    }
+                    result = num1 / num2;
+                    break;
+                default:
+                    return;
+            }
+
+            // Display Result (rounded to 2 decimal places if needed)
+            // Using logic to avoid .00 if it's an integer
+            if (Number.isInteger(result)) {
+                resultDisplay.textContent = result;
+            } else {
+                resultDisplay.textContent = result.toFixed(4).replace(/\.?0+$/, "");
+            }
+        }
+
+        function clearFields() {
+            document.getElementById('num1').value = '';
+            document.getElementById('num2').value = '';
+            document.getElementById('result-value').textContent = '---';
+        }
+    </script>
+</body>
+</html>

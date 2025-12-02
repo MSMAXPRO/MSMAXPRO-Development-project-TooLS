@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Motion Sentry Security</title>
+    <style>
+        body { background: #222; color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        
+        .monitor { position: relative; border: 5px solid #333; border-radius: 10px; overflow: hidden; display: inline-block; box-shadow: 0 0 20px black; }
+        
+        video { display: block; transform: scaleX(-1); /* Mirror effect */ }
+        
+        .status-badge {
+            position: absolute; top: 10px; left: 10px; padding: 5px 15px; border-radius: 4px; font-weight: bold; letter-spacing: 1px;
+            background: rgba(0,0,0,0.7); border: 1px solid #555; transition: 0.3s;
+        }
+        
+        .recording { background: red; color: white; animation: pulse 1s infinite; border-color: red; }
+        .watching { background: #10b981; color: white; border-color: #10b981; }
+
+        .gallery {
+            margin-top: 20px; display: flex; gap: 10px; overflow-x: auto; width: 100%; max-width: 800px; padding: 10px; background: #333; border-radius: 10px; min-height: 120px; align-items: center;
+        }
+        
+        .snap { width: 150px; border: 2px solid white; border-radius: 5px; animation: flash 0.5s; }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        @keyframes flash { 0% { filter: brightness(2); } 100% { filter: brightness(1); } }
+
+        .controls { margin-top: 10px; display: flex; gap: 15px; align-items: center; }
+        input[type=range] { width: 150px; }
+        label { font-size: 0.9rem; color: #ccc; }
+    </style>
+</head>
+<body>
+
+    <h1 style="color: #ef4444; margin-bottom: 10px;">MOTION SENTRY</h1>
+    
+    <div class="monitor">
+        <video id="video" width="640" height="480" autoplay muted></video>
+        <div id="badge" class="status-badge watching">ARMED & WATCHING</div>
+        <canvas id="motionCanvas" width="640" height="480" style="display: none;"></canvas>
+    </div>
+
+    <div class="controls">
+        <label>Sensitivity:</label>
+        <input type="range" id="sensitivity" min="10" max="100" value="30">
+        <span id="sens-val" style="color: #10b981;">30</span>
+        <button onclick="clearGallery()" style="padding: 8px 15px; background: #555; color: white; border: none; border-radius: 4px; cursor: pointer;">Clear Gallery</button>
+    </div>
+
+    <h3>Intruder Log:</h3>
+    <div class="gallery" id="gallery">
+        <p style="color: #777; width: 100%; text-align: center;">No motion detected yet...</p>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const motionCanvas = document.getElementById('motionCanvas');
+        const ctx = motionCanvas.getContext('2d');
+        const badge = document.getElementById('badge');
+        const gallery = document.getElementById('gallery');
+        const sensitivityInput = document.getElementById('sensitivity');
+        const sensVal = document.getElementById('sens-val');
+
+        let lastFrameData = null;
+        let motionTimeout = null;
+        let isCoolingDown = false; // To prevent spamming photos
+
+        // Start Camera
+        navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+            video.srcObject = stream;
+            // Loop for detection
+            setInterval(detectMotion, 100); // Check every 100ms
+        });
+
+        sensitivityInput.oninput = () => { sensVal.innerText = sensitivityInput.value; };
+
+        function detectMotion() {
+            // Draw current video frame to hidden canvas
+            ctx.drawImage(video, 0, 0, 640, 480);
+            const frameData = ctx.getImageData(0, 0, 640, 480);
+            
+            // If first frame, just save it
+            if (!lastFrameData) {
+                lastFrameData = frameData;
+                return;
+            }
+
+            // Compare pixels
+            const length = frameData.data.length;
+            let diffScore = 0;
+            const threshold = 30; // Pixel color difference threshold
+
+            // Loop through pixels (step by 4 for speed)
+            for (let i = 0; i < length; i += 4 * 10) { // Check every 10th pixel for performance
+                const rDiff = Math.abs(frameData.data[i] - lastFrameData.data[i]);
+                const gDiff = Math.abs(frameData.data[i+1] - lastFrameData.data[i+1]);
+                const bDiff = Math.abs(frameData.data[i+2] - lastFrameData.data[i+2]);
+                
+                if (rDiff + gDiff + bDiff > threshold) {
+                    diffScore++;
+                }
+            }
+
+            // Update status
+            const sensitivity = 110 - sensitivityInput.value; // Lower value = higher sensitivity in input
+            const triggerLevel = sensitivity * 10; 
+
+            if (diffScore > triggerLevel) {
+                triggerAlert();
+            } else {
+                if(!isCoolingDown) setStatus('watching');
+            }
+
+            lastFrameData = frameData;
+        }
+
+        function triggerAlert() {
+            if (isCoolingDown) return;
+
+            setStatus('recording');
+            takePhoto();
+
+            // Cooldown for 2 seconds before next photo
+            isCoolingDown = true;
+            setTimeout(() => {
+                isCoolingDown = false;
+                setStatus('watching');
+            }, 2000);
+        }
+
+        function setStatus(state) {
+            if (state === 'recording') {
+                badge.className = 'status-badge recording';
+                badge.innerText = "⚠ MOTION DETECTED";
+            } else {
+                badge.className = 'status-badge watching';
+                badge.innerText = "ARMED & WATCHING";
+            }
+        }
+
+        function takePhoto() {
+            // Create a small canvas for the snapshot
+            const snapCanvas = document.createElement('canvas');
+            snapCanvas.width = 320;
+            snapCanvas.height = 240;
+            const snapCtx = snapCanvas.getContext('2d');
+            snapCtx.drawImage(video, 0, 0, 320, 240);
+            
+            // Create Image Element
+            const img = document.createElement('img');
+            img.src = snapCanvas.toDataURL('image/jpeg');
+            img.className = 'snap';
+            
+            // Add to gallery
+            const emptyMsg = gallery.querySelector('p');
+            if(emptyMsg) emptyMsg.remove();
+            
+            gallery.prepend(img);
+            
+            // Keep gallery clean (max 10 photos)
+            if(gallery.children.length > 10) {
+                gallery.lastElementChild.remove();
+            }
+        }
+
+        function clearGallery() {
+            gallery.innerHTML = '<p style="color: #777; width: 100%; text-align: center;">No motion detected yet...</p>';
+        }
+    </script>
+</body>
+</html>

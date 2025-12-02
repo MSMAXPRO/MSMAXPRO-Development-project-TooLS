@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Minimal Analog Clock</title>
+    <style>
+        body {
+            background-color: #e0e5ec;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .clock {
+            width: 300px;
+            height: 300px;
+            background-color: #e0e5ec;
+            border-radius: 50%;
+            border: 10px solid #e0e5ec;
+            box-shadow: 
+                15px 15px 30px #a3b1c6, 
+                -15px -15px 30px #ffffff; /* Neumorphism Effect */
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Center Point */
+        .clock::after {
+            content: '';
+            width: 15px;
+            height: 15px;
+            background: #ff3d00;
+            border-radius: 50%;
+            position: absolute;
+            z-index: 10;
+        }
+
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom; /* Rotate from the bottom center */
+            border-radius: 10px;
+            transform: translateX(-50%); /* Center horizontally */
+        }
+
+        .hour {
+            width: 6px;
+            height: 70px;
+            background: #333;
+            z-index: 5;
+        }
+
+        .minute {
+            width: 4px;
+            height: 100px;
+            background: #555;
+            z-index: 6;
+        }
+
+        .second {
+            width: 2px;
+            height: 120px;
+            background: #ff3d00;
+            z-index: 7;
+        }
+
+        /* Numbers */
+        .number {
+            position: absolute;
+            font-family: 'Arial', sans-serif;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #555;
+            text-align: center;
+        }
+        .n12 { top: 15px; }
+        .n3  { right: 20px; }
+        .n6  { bottom: 15px; }
+        .n9  { left: 20px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="clock">
+        <div class="number n12">12</div>
+        <div class="number n3">3</div>
+        <div class="number n6">6</div>
+        <div class="number n9">9</div>
+
+        <div class="hand hour" id="hour-hand"></div>
+        <div class="hand minute" id="minute-hand"></div>
+        <div class="hand second" id="second-hand"></div>
+    </div>
+
+    <script>
+        const hourHand = document.getElementById('hour-hand');
+        const minuteHand = document.getElementById('minute-hand');
+        const secondHand = document.getElementById('second-hand');
+
+        function updateClock() {
+            const now = new Date();
+            
+            const seconds = now.getSeconds();
+            const minutes = now.getMinutes();
+            const hours = now.getHours();
+
+            // Calculate degrees
+            const secondsDegrees = ((seconds / 60) * 360);
+            const minutesDegrees = ((minutes / 60) * 360) + ((seconds/60)*6);
+            const hoursDegrees = ((hours / 12) * 360) + ((minutes/60)*30);
+
+            // Apply rotation
+            // Note: We subtract 50% via CSS transform usually, but here we need pure rotation
+            // We kept transform-origin: bottom.
+            
+            secondHand.style.transform = `translateX(-50%) rotate(${secondsDegrees}deg)`;
+            minuteHand.style.transform = `translateX(-50%) rotate(${minutesDegrees}deg)`;
+            hourHand.style.transform = `translateX(-50%) rotate(${hoursDegrees}deg)`;
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock(); // Run immediately
+    </script>
+</body>
+</html>

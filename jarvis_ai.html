@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>J.A.R.V.I.S. AI Vision</title>
+    <!-- Load TensorFlow.js and COCO-SSD Model -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+    <style>
+        body { margin: 0; background: black; overflow: hidden; font-family: 'Courier New', Courier, monospace; }
+        
+        .hud-container { position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; }
+        
+        video { position: absolute; min-width: 100%; min-height: 100%; object-fit: cover; opacity: 0.6; }
+        
+        canvas { position: absolute; top: 0; left: 0; z-index: 10; }
+        
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 50%, black 150%);
+            pointer-events: none; z-index: 5;
+            box-shadow: inset 0 0 50px #00ffcc;
+        }
+
+        .ui-layer { position: absolute; z-index: 20; width: 100%; height: 100%; pointer-events: none; }
+        
+        .corner { position: absolute; width: 50px; height: 50px; border: 3px solid #00ffcc; }
+        .tl { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+        .tr { top: 20px; right: 20px; border-left: none; border-bottom: none; }
+        .bl { bottom: 20px; left: 20px; border-right: none; border-top: none; }
+        .br { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+
+        .center-crosshair {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 100px; height: 100px; border: 1px solid rgba(0, 255, 204, 0.3); border-radius: 50%;
+        }
+        .center-crosshair::after {
+            content: ''; position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; background: #00ffcc; transform: translate(-50%, -50%);
+        }
+
+        .loading-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #00ffcc;
+        }
+
+        .spinner {
+            width: 50px; height: 50px; border: 5px solid #00332a; border-top: 5px solid #00ffcc; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .tag {
+            background: rgba(0, 20, 20, 0.7); border: 1px solid #00ffcc; color: #00ffcc; padding: 2px 5px; font-size: 12px; font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="loading-screen" id="loader">
+        <div class="spinner"></div>
+        <h2 id="status">INITIALIZING SYSTEMS...</h2>
+        <p>Loading Neural Network (This takes a moment)</p>
+    </div>
+
+    <div class="hud-container">
+        <video id="video" autoplay muted playsinline></video>
+        <canvas id="canvas"></canvas>
+        <div class="overlay"></div>
+        
+        <!-- Sci-Fi UI Elements -->
+        <div class="ui-layer">
+            <div class="corner tl"></div>
+            <div class="corner tr"></div>
+            <div class="corner bl"></div>
+            <div class="corner br"></div>
+            <div class="center-crosshair"></div>
+            <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: #00ffcc; text-shadow: 0 0 5px #00ffcc;">
+                SYSTEM ONLINE | TARGETING ACTIVE
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const loader = document.getElementById('loader');
+        const statusText = document.getElementById('status');
+        
+        let model = null;
+
+        // 1. Setup Camera
+        async function setupCamera() {
+            statusText.innerText = "ACCESSING OPTICAL SENSORS...";
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "environment" },
+                audio: false
+            });
+            video.srcObject = stream;
+            return new Promise((resolve) => {
+                video.onloadedmetadata = () => {
+                    video.play();
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    resolve(video);
+                };
+            });
+        }
+
+        // 2. Load AI Model
+        async function loadModel() {
+            statusText.innerText = "LOADING NEURAL NETWORK...";
+            // Load COCO-SSD model
+            model = await cocoSsd.load();
+            statusText.innerText = "SYSTEM READY";
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+            }, 500);
+            detectFrame();
+        }
+
+        // 3. Real-time Detection Loop
+        function detectFrame() {
+            model.detect(video).then(predictions => {
+                renderPredictions(predictions);
+                requestAnimationFrame(detectFrame);
+            });
+        }
+
+        // 4. Render Boxes (The "Iron Man" effect)
+        function renderPredictions(predictions) {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Adjust canvas size if window resizes
+            if(canvas.width !== video.videoWidth) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+            }
+
+            ctx.font = '16px "Courier New"';
+            ctx.lineWidth = 2;
+
+            predictions.forEach(prediction => {
+                const [x, y, width, height] = prediction.bbox;
+                const text = prediction.class.toUpperCase();
+                const score = Math.round(prediction.score * 100) + '%';
+
+                // Color Logic based on confidence
+                const color = prediction.score > 0.8 ? '#00ffcc' : '#ffcc00';
+
+                // Draw Box
+                ctx.strokeStyle = color;
+                ctx.strokeRect(x, y, width, height);
+
+                // Draw Corner Markers for tech look
+                ctx.beginPath();
+                ctx.moveTo(x, y + 10); ctx.lineTo(x, y); ctx.lineTo(x + 10, y); // Top Left
+                ctx.moveTo(x + width - 10, y); ctx.lineTo(x + width, y); ctx.lineTo(x + width, y + 10); // Top Right
+                ctx.moveTo(x + width, y + height - 10); ctx.lineTo(x + width, y + height); ctx.lineTo(x + width - 10, y + height); // Bottom Right
+                ctx.moveTo(x + 10, y + height); ctx.lineTo(x, y + height); ctx.lineTo(x, y + height - 10); // Bottom Left
+                ctx.stroke();
+
+                // Draw Label Background
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                const textWidth = ctx.measureText(text + " " + score).width;
+                ctx.fillRect(x, y - 25, textWidth + 10, 25);
+
+                // Draw Text
+                ctx.fillStyle = color;
+                ctx.fillText(text + " " + score, x + 5, y - 7);
+                
+                // Connecting line to center (Target lock style)
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(0, 255, 204, 0.1)';
+                ctx.moveTo(canvas.width/2, canvas.height/2);
+                ctx.lineTo(x + width/2, y + height/2);
+                ctx.stroke();
+            });
+        }
+
+        // Start System
+        setupCamera().then(() => {
+            loadModel();
+        }).catch(err => {
+            alert("Camera Error: " + err.message);
+        });
+
+    </script>
+</body>
+</html>

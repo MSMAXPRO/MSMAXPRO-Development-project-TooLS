@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Speed Typer Pro</title>
+    <style>
+        body {
+            background: #232323;
+            color: #eee;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 800px;
+            background: #333;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background: #444;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .stat-box span { color: #facc15; }
+
+        #quote-display {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            word-spacing: 5px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            background: #222;
+            border: 2px solid #555;
+            color: white;
+            font-size: 1.2rem;
+            padding: 15px;
+            border-radius: 10px;
+            resize: none;
+            outline: none;
+            font-family: inherit;
+        }
+
+        textarea:focus { border-color: #facc15; }
+
+        /* Coloring spans for correct/incorrect */
+        .correct { color: #4ade80; }
+        .incorrect { color: #ef4444; text-decoration: underline; }
+        
+        button {
+            margin-top: 20px;
+            padding: 10px 25px;
+            background: #facc15;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 style="text-align:center; color: #facc15;">SPEED TYPER</h1>
+        
+        <div class="stats">
+            <div class="stat-box">Time: <span id="timer">60</span>s</div>
+            <div class="stat-box">WPM: <span id="wpm">0</span></div>
+            <div class="stat-box">Accuracy: <span id="accuracy">100</span>%</div>
+        </div>
+
+        <div id="quote-display">Click Start to begin...</div>
+        
+        <textarea id="quote-input" placeholder="Start typing here..." disabled></textarea>
+        
+        <div style="text-align: center;">
+            <button onclick="startGame()">Restart Test</button>
+        </div>
+    </div>
+
+    <script>
+        const RANDOM_QUOTES = [
+            "The quick brown fox jumps over the lazy dog.",
+            "To be or not to be, that is the question.",
+            "Coding is not just about logic, it is about art and creativity.",
+            "Success is stumbling from failure to failure with no loss of enthusiasm.",
+            "In the middle of difficulty lies opportunity.",
+            "Python is great but JavaScript makes the web come alive."
+        ];
+
+        const quoteDisplay = document.getElementById('quote-display');
+        const quoteInput = document.getElementById('quote-input');
+        const timerElement = document.getElementById('timer');
+        const wpmElement = document.getElementById('wpm');
+        const accElement = document.getElementById('accuracy');
+
+        let timer = 60;
+        let timerInterval = null;
+        let started = false;
+        let currentQuote = "";
+
+        quoteInput.addEventListener('input', () => {
+            if (!started) return;
+            
+            const arrayQuote = quoteDisplay.querySelectorAll('span');
+            const arrayValue = quoteInput.value.split('');
+
+            let correctChars = 0;
+            let allCorrect = true;
+
+            arrayQuote.forEach((characterSpan, index) => {
+                const character = arrayValue[index];
+                if (character == null) {
+                    characterSpan.classList.remove('correct');
+                    characterSpan.classList.remove('incorrect');
+                    allCorrect = false;
+                } else if (character === characterSpan.innerText) {
+                    characterSpan.classList.add('correct');
+                    characterSpan.classList.remove('incorrect');
+                    correctChars++;
+                } else {
+                    characterSpan.classList.remove('correct');
+                    characterSpan.classList.add('incorrect');
+                    allCorrect = false;
+                }
+            });
+
+            // Calculate Stats
+            let totalTyped = arrayValue.length;
+            let accuracy = totalTyped > 0 ? Math.round((correctChars / totalTyped) * 100) : 100;
+            accElement.innerText = accuracy;
+
+            // WPM = (Characters / 5) / Time Elapsed (in mins)
+            let timeElapsed = 60 - timer;
+            if (timeElapsed > 0) {
+                 // Prevent infinity
+                let wpm = Math.round((correctChars / 5) / (timeElapsed / 60));
+                wpmElement.innerText = wpm;
+            }
+
+            if (allCorrect) {
+                renderNewQuote();
+                quoteInput.value = '';
+            }
+        });
+
+        function getRandomQuote() {
+            return RANDOM_QUOTES[Math.floor(Math.random() * RANDOM_QUOTES.length)];
+        }
+
+        function renderNewQuote() {
+            currentQuote = getRandomQuote();
+            quoteDisplay.innerHTML = '';
+            currentQuote.split('').forEach(character => {
+                const characterSpan = document.createElement('span');
+                characterSpan.innerText = character;
+                quoteDisplay.appendChild(characterSpan);
+            });
+            quoteInput.value = null;
+        }
+
+        function startGame() {
+            clearInterval(timerInterval);
+            timer = 60;
+            started = true;
+            timerElement.innerText = timer;
+            wpmElement.innerText = 0;
+            accElement.innerText = 100;
+            
+            quoteInput.disabled = false;
+            quoteInput.value = '';
+            quoteInput.focus();
+            
+            renderNewQuote();
+
+            timerInterval = setInterval(() => {
+                timer--;
+                timerElement.innerText = timer;
+                if (timer <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            started = false;
+            quoteInput.disabled = true;
+            quoteDisplay.innerText = "Time's up! Check your WPM above.";
+        }
+    </script>
+</body>
+</html>
