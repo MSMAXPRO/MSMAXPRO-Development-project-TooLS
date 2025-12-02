@@ -222,20 +222,30 @@
 
     <script>
         // ======================================================
-        //     👇 APNA 10-DIGIT SECRET PIN YAHAN SET KAREIN 👇
+        //   🔒 SECURE HASH LOCK SYSTEM 🔒
         // ======================================================
         
-        const SECRET_PIN = "6398686504";  // Change this!
-        
-        // ======================================================
+        let SECRET_HASH = "1c9cc424fcdf113c1b86bc8d4e8b5301919cf8430a039f2e1acfaf28259a1218";
+
 
         let currentPin = "";
         const pinDisplay = document.getElementById('pinDisplay');
         const lockScreen = document.getElementById('lock-screen');
         const dashboard = document.getElementById('dashboard');
 
+        // Function to generate SHA-256 Hash
+        async function generateHash(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            console.log("👇 Copy this hash and paste it in SECRET_HASH 👇");
+            console.log(hashHex);
+            return hashHex;
+        }
+
         function enterDigit(digit) {
-            if (currentPin.length < 10) {
+            if (currentPin.length < 20) { // Limit badha di hai just in case
                 currentPin += digit;
                 updateDisplay();
             }
@@ -251,8 +261,11 @@
             pinDisplay.classList.remove('error-anim');
         }
 
-        function checkPin() {
-            if (currentPin === SECRET_PIN) {
+        async function checkPin() {
+            // Check hash instead of plain text
+            const inputHash = await generateHash(currentPin);
+            
+            if (inputHash === SECRET_HASH) {
                 unlock();
             } else {
                 pinDisplay.classList.add('error-anim');
@@ -278,5 +291,4 @@
         }
     </script>
 </body>
-
 </html>
