@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1>🧰 MSMAXPRO Development project Tools</h1>
+<h1>🧰 MSMAXPRO Development Tools</h1>
 
 <p>
 A curated collection of <b>frontend-based utility tools and experimental mini-projects</b><br>
@@ -23,8 +23,8 @@ Designed for <b>learning, experimentation, and practical usage</b>.
 <h2>📌 Overview</h2>
 
 <p>
-<b>MSMAXPRO Development project Tools</b> is a toolbox of standalone web applications.
-Each tool focuses on a specific concept such as:
+<b>MSMAXPRO Development Tools</b> is a toolbox of standalone web applications.
+Each tool focuses on specific frontend concepts such as:
 </p>
 
 <ul>
@@ -82,15 +82,15 @@ All tools run <b>entirely in the browser</b> — no backend, no setup required.
 
 <h3>📷 Device & Sensor Experiments</h3>
 <ul>
-  <li>📸 <b>Motion Camera Demo</b> – Camera/motion experiment</li>
-  <li>👆 <b>Ghost Touch Tester</b> – Touch interaction testing</li>
-  <li>❤️ <b>Bio Monitor (Concept)</b> – Health monitoring UI</li>
+  <li>📸 <b>Motion Camera Demo</b> – Camera and motion-based experiment</li>
+  <li>👆 <b>Ghost Touch Tester</b> – Touch interaction testing tool</li>
+  <li>❤️ <b>Bio Monitor (Concept)</b> – Health monitoring UI concept</li>
 </ul>
 
 <h3>📄 File & Text Tools</h3>
 <ul>
-  <li>🖼️ <b>Image Text Copy Tool</b> – Copy text from images (frontend demo)</li>
-  <li>📑 <b>PDF Master (Concept)</b> – PDF utility UI concept</li>
+  <li>🖼️ <b>Image Text Copy Tool</b> – Extract and copy text from images (frontend demo)</li>
+  <li>📑 <b>PDF Master (Concept)</b> – PDF utility interface concept</li>
 </ul>
 
 <h3>🤖 Assistant Concept</h3>
@@ -112,7 +112,7 @@ git clone https://github.com/MSMAXPRO/MSMAXPRO-Development-project-TooLS.git
 
 <p>
 Open any <code>.html</code> file directly in your browser<br>
-or open <code>index.html</code> to explore multiple tools.
+or open <code>index.html</code> to explore all available tools.
 </p>
 
 <hr>
@@ -136,9 +136,9 @@ or open <code>index.html</code> to explore multiple tools.
 
 <ul>
   <li>📚 Learning by building</li>
-  <li>🧪 Experimenting with web concepts</li>
-  <li>👨‍💻 Practicing frontend skills</li>
-  <li>🤝 Helping beginners explore utilities</li>
+  <li>🧪 Experimenting with frontend concepts</li>
+  <li>👨‍💻 Practicing web development skills</li>
+  <li>🤝 Helping beginners explore utility tools</li>
 </ul>
 
 <hr>
@@ -147,7 +147,7 @@ or open <code>index.html</code> to explore multiple tools.
 
 <p>
 Licensed under the <b>MIT License</b>.<br>
-Free to use, modify, and distribute with attribution.
+Free to use, modify, and distribute with proper attribution.
 </p>
 
 <hr>
