@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1>🧰 MSMAXPRO Impossible Tools</h1>
+<h1>🧰 MSMAXPRO Development project Tools</h1>
 
 <p>
 A curated collection of <b>frontend-based utility tools and experimental mini-projects</b><br>
@@ -23,7 +23,7 @@ Designed for <b>learning, experimentation, and practical usage</b>.
 <h2>📌 Overview</h2>
 
 <p>
-<b>MSMAXPRO Impossible Tools</b> is a toolbox of standalone web applications.
+<b>MSMAXPRO Development project Tools</b> is a toolbox of standalone web applications.
 Each tool focuses on a specific concept such as:
 </p>
 
