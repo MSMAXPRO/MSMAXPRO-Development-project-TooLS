@@ -107,7 +107,7 @@ All tools run <b>entirely in the browser</b> — no backend, no setup required.
 </ol>
 
 <pre>
-git clone https://github.com/MSMAXPRO/MSMAXPRO-Impossible-TooLS.git
+git clone https://github.com/MSMAXPRO/MSMAXPRO-Development-project-TooLS.git
 </pre>
 
 <p>
