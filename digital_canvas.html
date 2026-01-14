@@ -2,88 +2,181 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Neon Paint Studio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Paint Studio - CodeWithMsMaxPro</title>
     <style>
+        /* Website Theme Variables */
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --primary-purple: #8b5cf6;
+            --text-white: #f8fafc;
+            --accent-glow: rgba(139, 92, 246, 0.4);
+            --error-red: #f43f5e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+        }
+
         body {
-            background-color: #121212;
-            color: white;
-            font-family: sans-serif;
+            background-color: var(--bg-dark);
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 35px 35px;
+            color: var(--text-white);
             display: flex;
             flex-direction: column;
             align-items: center;
             height: 100vh;
-            margin: 0;
+            padding: 20px;
             overflow: hidden;
         }
 
-        h2 { margin: 10px 0; color: #00e5ff; }
+        .header-box {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .web-link {
+            color: var(--primary-purple);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
 
         .toolbar {
-            background: #222;
-            padding: 10px 20px;
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 12px 25px;
             border-radius: 50px;
             display: flex;
+            align-items: center;
             gap: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            z-index: 10;
         }
 
         .color-btn {
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             cursor: pointer;
-            border: 2px solid #555;
-            transition: transform 0.2s;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
         }
 
         .color-btn:hover { transform: scale(1.2); }
-        .color-btn.active { border-color: white; box-shadow: 0 0 10px white; }
+        .color-btn.active { 
+            border-color: white; 
+            box-shadow: 0 0 15px currentColor;
+            transform: scale(1.1);
+        }
 
-        button#clear-btn {
-            background: #ff3d00;
-            color: white;
-            border: none;
-            padding: 8px 15px;
+        #clear-btn {
+            background: transparent;
+            color: var(--error-red);
+            border: 1px solid var(--error-red);
+            padding: 6px 18px;
             border-radius: 20px;
             cursor: pointer;
-            font-weight: bold;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            margin-left: 10px;
+        }
+
+        #clear-btn:hover {
+            background: var(--error-red);
+            color: white;
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.4);
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
         }
 
         canvas {
             background: #000;
-            border: 2px solid #333;
-            border-radius: 10px;
+            border: 2px solid var(--card-bg);
+            border-radius: 20px;
             cursor: crosshair;
-            box-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            max-width: 100%;
+            max-height: 100%;
+            touch-action: none; /* Critical for mobile touch */
+        }
+
+        .brush-hint {
+            position: absolute;
+            bottom: -25px;
+            font-size: 0.7rem;
+            color: #64748b;
+            font-style: italic;
         }
     </style>
 </head>
 <body>
 
-    <h2>DIGITAL CANVAS</h2>
+    <div class="header-box">
+        <h1>Neon Paint Studio</h1>
+        <a href="https://codewithmsmaxpro.me" class="web-link">codewithmsmaxpro.me</a>
+    </div>
     
     <div class="toolbar">
-        <div class="color-btn active" style="background: #ffffff;" onclick="setColor(this, '#ffffff')"></div>
-        <div class="color-btn" style="background: #00e5ff;" onclick="setColor(this, '#00e5ff')"></div>
-        <div class="color-btn" style="background: #ff00ff;" onclick="setColor(this, '#ff00ff')"></div>
-        <div class="color-btn" style="background: #ffff00;" onclick="setColor(this, '#ffff00')"></div>
-        <div class="color-btn" style="background: #00ff00;" onclick="setColor(this, '#00ff00')"></div>
-        <button id="clear-btn" onclick="clearCanvas()">CLEAR</button>
+        <div class="color-btn active" style="background: #8b5cf6; color: #8b5cf6;" onclick="setColor(this, '#8b5cf6')"></div>
+        <div class="color-btn" style="background: #00f2ff; color: #00f2ff;" onclick="setColor(this, '#00f2ff')"></div>
+        <div class="color-btn" style="background: #ff0077; color: #ff0077;" onclick="setColor(this, '#ff0077')"></div>
+        <div class="color-btn" style="background: #39ff14; color: #39ff14;" onclick="setColor(this, '#39ff14')"></div>
+        <div class="color-btn" style="background: #ffffff; color: #ffffff;" onclick="setColor(this, '#ffffff')"></div>
+        <button id="clear-btn" onclick="clearCanvas()">RESET STAGE</button>
     </div>
 
-    <canvas id="drawing-board" width="800" height="500"></canvas>
+    <div class="canvas-container">
+        <canvas id="drawing-board"></canvas>
+        <p class="brush-hint">Tip: Use your mouse or finger to create neon art</p>
+    </div>
 
     <script>
         const canvas = document.getElementById('drawing-board');
         const ctx = canvas.getContext('2d');
         let isDrawing = false;
-        let currentColor = '#ffffff';
+        let currentColor = '#8b5cf6';
 
-        // Set initial canvas style
-        ctx.lineWidth = 5;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = currentColor;
+        // Dynamic Canvas Sizing
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            
+            // Re-apply brush settings after resize
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
         function startPosition(e) {
             isDrawing = true;
@@ -92,19 +185,22 @@
 
         function endPosition() {
             isDrawing = false;
-            ctx.beginPath(); // Reset path so lines don't connect
+            ctx.beginPath();
         }
 
         function draw(e) {
             if (!isDrawing) return;
 
-            // Get mouse position relative to canvas
             const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+            // Handle both mouse and touch events
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
 
             ctx.strokeStyle = currentColor;
-            ctx.shadowBlur = 10; // Neon glow effect
+            ctx.shadowBlur = 15;
             ctx.shadowColor = currentColor;
 
             ctx.lineTo(x, y);
@@ -115,7 +211,6 @@
 
         function setColor(elem, color) {
             currentColor = color;
-            // Update active class UI
             document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('active'));
             elem.classList.add('active');
         }
@@ -129,30 +224,15 @@
         canvas.addEventListener('mouseup', endPosition);
         canvas.addEventListener('mousemove', draw);
         
-        // Touch support for mobile
+        // Touch support
         canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // Prevent scrolling
-            const touch = e.touches[0];
-            const mouseEvent = new MouseEvent("mousedown", {
-                clientX: touch.clientX,
-                clientY: touch.clientY
-            });
-            canvas.dispatchEvent(mouseEvent);
+            e.preventDefault();
+            startPosition(e);
         });
-        
-        canvas.addEventListener('touchend', () => {
-            const mouseEvent = new MouseEvent("mouseup", {});
-            canvas.dispatchEvent(mouseEvent);
-        });
-
+        canvas.addEventListener('touchend', endPosition);
         canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
-            const touch = e.touches[0];
-            const mouseEvent = new MouseEvent("mousemove", {
-                clientX: touch.clientX,
-                clientY: touch.clientY
-            });
-            canvas.dispatchEvent(mouseEvent);
+            draw(e);
         });
     </script>
 </body>
