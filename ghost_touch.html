@@ -2,129 +2,233 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Ghost Touch - AI Gesture Control</title>
-    <!-- Import MediaPipe Hands & Drawing Utils -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghost Touch AI - CodeWithMsMaxPro</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     
     <style>
-        body { margin: 0; background: #0f172a; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        /* Website Theme Variables */
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --primary-purple: #8b5cf6;
+            --neon-cyan: #00f2ff;
+            --text-white: #f8fafc;
+            --accent-glow: rgba(139, 92, 246, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
         
-        /* Layout */
+        body { 
+            background: var(--bg-dark); 
+            color: var(--text-white); 
+            overflow: hidden; 
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.03) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+        
         .container { display: flex; height: 100vh; }
         
-        /* Webcam Panel (Left) */
+        /* Camera Sidebar (Glassmorphism) */
         .cam-panel {
-            width: 320px; background: #000; position: relative; border-right: 2px solid #334155;
-            display: flex; justify-content: center; align-items: center; flex-direction: column;
+            width: 320px; 
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(15px);
+            position: relative; 
+            border-right: 1px solid rgba(255,255,255,0.1);
+            display: flex; 
+            flex-direction: column;
+            z-index: 100;
         }
         
-        video { display: none; } /* Hide raw video */
+        .cam-header {
+            padding: 25px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .cam-header h2 {
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            color: var(--primary-purple);
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        video { display: none; }
         
         canvas.output_canvas {
-            width: 100%; height: auto; transform: scaleX(-1); /* Mirror effect */
-            border-bottom: 2px solid #00ffcc;
+            width: 100%; 
+            height: auto; 
+            transform: scaleX(-1);
+            border-bottom: 2px solid var(--primary-purple);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
-        .status { padding: 20px; color: #00ffcc; font-size: 0.9rem; text-align: center; }
-        .instructions { padding: 20px; font-size: 0.8rem; color: #94a3b8; line-height: 1.6; }
+        .status-box {
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.5);
+            margin: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            text-align: center;
+        }
 
-        /* Content Panel (Right - Scrollable) */
+        #status { font-weight: 800; font-size: 0.8rem; color: var(--neon-cyan); letter-spacing: 1px; }
+
+        .instructions { 
+            padding: 20px; 
+            font-size: 0.75rem; 
+            color: #94a3b8; 
+            line-height: 1.8; 
+        }
+
+        /* Content Area */
         .content-panel {
-            flex: 1; padding: 50px; overflow-y: auto; scroll-behavior: smooth; position: relative;
+            flex: 1; 
+            padding: 60px; 
+            overflow-y: auto; 
+            scroll-behavior: smooth; 
+            position: relative;
         }
 
-        .article { max-width: 800px; margin: 0 auto; }
-        h1 { font-size: 3rem; margin-bottom: 20px; color: #38bdf8; }
-        p { font-size: 1.2rem; line-height: 1.8; color: #cbd5e1; margin-bottom: 20px; }
+        .article { max-width: 750px; margin: 0 auto; }
         
-        .dummy-img { width: 100%; height: 300px; background: #1e293b; border-radius: 10px; margin: 20px 0; }
+        h1 { 
+            font-size: 3.5rem; 
+            margin-bottom: 20px; 
+            background: linear-gradient(to right, #fff, var(--primary-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p { font-size: 1.1rem; line-height: 1.8; color: #94a3b8; margin-bottom: 25px; }
+        
+        .dummy-img { 
+            width: 100%; 
+            height: 350px; 
+            background: var(--card-bg); 
+            border-radius: 20px; 
+            margin: 30px 0;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
         
         .interactive-btn {
-            padding: 15px 30px; background: #e11d48; border: none; color: white; font-size: 1.2rem; border-radius: 50px; cursor: pointer; transition: 0.3s;
-        }
-        .interactive-btn:hover, .interactive-btn.hovered {
-            background: #fff; color: #e11d48; transform: scale(1.1); box-shadow: 0 0 20px #e11d48;
+            padding: 18px 40px; 
+            background: var(--primary-purple); 
+            border: none; 
+            color: white; 
+            font-size: 1rem; 
+            font-weight: 800;
+            border-radius: 12px; 
+            cursor: pointer; 
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 20px var(--accent-glow);
         }
 
-        /* The Ghost Cursor */
+        .interactive-btn.hovered {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 15px 30px var(--accent-glow);
+            filter: brightness(1.2);
+        }
+
+        /* The Ghost Cursor (Modernized) */
         .ghost-cursor {
-            position: fixed; width: 20px; height: 20px;
-            background: rgba(0, 255, 204, 0.7);
-            border: 2px solid #fff; border-radius: 50%;
-            pointer-events: none; /* Let clicks pass through */
+            position: fixed; 
+            width: 30px; 
+            height: 30px;
+            background: rgba(139, 92, 246, 0.2);
+            border: 2px solid var(--primary-purple); 
+            border-radius: 50%;
+            pointer-events: none;
             z-index: 9999;
             transform: translate(-50%, -50%);
-            transition: width 0.1s, height 0.1s, background 0.1s;
-            box-shadow: 0 0 15px #00ffcc;
+            transition: width 0.15s, height 0.15s, background 0.15s;
+            box-shadow: 0 0 20px var(--primary-purple);
         }
         
         .ghost-cursor.clicking {
-            background: #ff0055; width: 15px; height: 15px;
+            background: var(--neon-cyan); 
+            width: 20px; 
+            height: 20px;
+            box-shadow: 0 0 25px var(--neon-cyan);
+            border-color: #fff;
         }
 
         /* Scroll Zones */
         .scroll-zone {
-            position: fixed; left: 320px; right: 0; height: 100px; 
-            background: linear-gradient(to bottom, rgba(0, 255, 204, 0.1), transparent);
+            position: fixed; left: 320px; right: 0; height: 120px; 
             pointer-events: none; display: flex; justify-content: center; align-items: center;
-            color: #00ffcc; font-weight: bold; letter-spacing: 2px; opacity: 0; transition: 0.3s;
+            color: var(--primary-purple); font-weight: 900; letter-spacing: 5px; opacity: 0; transition: 0.4s;
+            font-size: 1.5rem;
         }
-        .scroll-top { top: 0; }
-        .scroll-bottom { bottom: 0; background: linear-gradient(to top, rgba(0, 255, 204, 0.1), transparent); }
-        
-        .active-zone { opacity: 1; }
+        .scroll-top { top: 0; background: linear-gradient(to bottom, rgba(139, 92, 246, 0.15), transparent); }
+        .scroll-bottom { bottom: 0; background: linear-gradient(to top, rgba(139, 92, 246, 0.15), transparent); }
+        .active-zone { opacity: 1; transform: scale(1.1); }
     </style>
 </head>
 <body>
 
-    <!-- Virtual Cursor -->
     <div id="cursor" class="ghost-cursor"></div>
 
-    <!-- Scroll Indicators -->
-    <div id="zoneTop" class="scroll-zone scroll-top">SCROLL UP</div>
-    <div id="zoneBottom" class="scroll-zone scroll-bottom">SCROLL DOWN</div>
+    <div id="zoneTop" class="scroll-zone scroll-top">UPSTREAM</div>
+    <div id="zoneBottom" class="scroll-zone scroll-bottom">DOWNSTREAM</div>
 
     <div class="container">
-        <!-- Sidebar for Camera -->
         <div class="cam-panel">
-            <h3 style="color: white; margin: 10px;">GHOST TOUCH</h3>
+            <div class="cam-header">
+                <h2>GHOST TOUCH AI</h2>
+                <a href="https://codewithmsmaxpro.me" style="color: #64748b; font-size: 0.7rem; text-decoration: none;">codewithmsmaxpro.me</a>
+            </div>
+            
             <canvas class="output_canvas" width="320" height="240"></canvas>
-            <div class="status" id="status">Loading AI Model...</div>
+            
+            <div class="status-box">
+                <div id="status">INITIALIZING AI SENSORS...</div>
+            </div>
+
             <div class="instructions">
-                1. <strong>Move:</strong> Use Index Finger to move cursor.<br>
-                2. <strong>Click:</strong> Pinch Index & Thumb.<br>
-                3. <strong>Scroll:</strong> Move hand to Top or Bottom edge.
+                <strong>[ NAVIGATION GUIDE ]</strong><br>
+                • <b>CURSOR:</b> Move your Index Finger.<br>
+                • <b>CLICK:</b> Pinch Index & Thumb.<br>
+                • <b>SCROLL:</b> Move hand to Screen Edges.
             </div>
         </div>
 
-        <!-- Main Website Content -->
         <div class="content-panel" id="scrollContainer">
             <div class="article">
-                <h1>Future Interface</h1>
-                <p>Welcome to the touchless era. You are controlling this entire page without touching your mouse or screen. Just wave your hand in the air.</p>
+                <h1>Touchless Future.</h1>
+                <p>Welcome to the next generation of web interaction. Using your webcam and MediaPipe's machine learning models, we've enabled full spatial control over this document.</p>
+                
                 <div class="dummy-img"></div>
-                <p>Computer vision algorithms are tracking 21 landmarks on your hand in real-time. By mapping your index finger's coordinates to the screen dimensions, we create a virtual mouse.</p>
-                <button class="interactive-btn" onclick="alert('Ghost Click Successful!')">Try Clicking Me!</button>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                
+                <p>The system tracks 21 individual hand landmarks at 30+ FPS. By calculating the Euclidean distance between your thumb and index tips, we simulate a hardware mouse click in real-time.</p>
+                
+                <button class="interactive-btn" onclick="alert('Ghost Interaction Confirmed!')">Activate Ghost Click</button>
+                
                 <div class="dummy-img"></div>
-                <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                <p>Keep scrolling down using gestures...</p>
-                <button class="interactive-btn" onclick="document.body.style.background = '#220033'">Change Theme</button>
-                <div style="height: 500px;"></div>
-                <p>You reached the bottom!</p>
+                
+                <p>This technology bypasses traditional peripherals, offering a glimpse into how we might interact with AR/VR environments and public kiosks in a post-touch world.</p>
+                
+                <div style="height: 600px; border-left: 2px solid var(--primary-purple); margin-left: 20px; padding-left: 20px;">
+                    <p style="color: var(--primary-purple); font-weight: 800;">[ DEEP SCROLL DETECTED ]</p>
+                    <p>You have reached the data core. Your hand gestures are being translated into DOM events seamlessly.</p>
+                </div>
+                
+                <p>End of Transmission.</p>
             </div>
         </div>
     </div>
 
-    <!-- Hidden Video for Input -->
     <video class="input_video"></video>
 
     <script>
-        const videoElement = document.getElementsByClassName('input_video')[0];
-        const canvasElement = document.getElementsByClassName('output_canvas')[0];
+        const videoElement = document.querySelector('.input_video');
+        const canvasElement = document.querySelector('.output_canvas');
         const canvasCtx = canvasElement.getContext('2d');
         const cursor = document.getElementById('cursor');
         const scrollContainer = document.getElementById('scrollContainer');
@@ -137,44 +241,36 @@
         function onResults(results) {
             canvasCtx.save();
             canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-            
-            // Draw camera feed
             canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                statusText.innerText = "HAND DETECTED";
-                statusText.style.color = "#00ffcc";
+                statusText.innerText = "SENSORS ACTIVE: HAND TRACKED";
+                statusText.style.color = "var(--neon-cyan)";
 
                 const landmarks = results.multiHandLandmarks[0];
                 
-                // Draw skeleton on canvas
-                drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {color: '#00ffcc', lineWidth: 2});
-                drawLandmarks(canvasCtx, landmarks, {color: '#ff0055', lineWidth: 1});
+                // Optimized Drawing for Theme
+                drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {color: '#8b5cf6', lineWidth: 3});
+                drawLandmarks(canvasCtx, landmarks, {color: '#00f2ff', lineWidth: 1, radius: 2});
 
-                // --- GESTURE LOGIC ---
-                
-                // 1. Get Coordinates of Index Tip (8) and Thumb Tip (4)
-                // Landmarks are normalized [0.0, 1.0]. 
-                // x is inverted because of mirror effect
                 const indexTip = landmarks[8];
                 const thumbTip = landmarks[4];
                 
-                // Map Index Tip to Screen Coordinates
+                // Smooth Cursor Mapping
                 const x = (1 - indexTip.x) * window.innerWidth;
                 const y = indexTip.y * window.innerHeight;
 
-                // Move Ghost Cursor
                 cursor.style.left = `${x}px`;
                 cursor.style.top = `${y}px`;
 
-                // 2. Click Detection (Pinch)
-                // Calculate distance between Index and Thumb
+                // Pinch detection (Distance < 0.05)
                 const distance = Math.hypot(indexTip.x - thumbTip.x, indexTip.y - thumbTip.y);
                 
-                if (distance < 0.05) { // Threshold for pinch
+                if (distance < 0.045) {
                     if (!isClicking) {
                         cursor.classList.add('clicking');
-                        triggerClick(x, y);
+                        const el = document.elementFromPoint(x, y);
+                        if (el) el.click();
                         isClicking = true;
                     }
                 } else {
@@ -182,18 +278,20 @@
                     isClicking = false;
                 }
 
-                // 3. Hover Effects
-                checkHover(x, y);
+                // Hover Simulation
+                const hoverEl = document.elementFromPoint(x, y);
+                document.querySelectorAll('.interactive-btn').forEach(b => b.classList.remove('hovered'));
+                if (hoverEl && hoverEl.classList.contains('interactive-btn')) {
+                    hoverEl.classList.add('hovered');
+                }
 
-                // 4. Scroll Logic (Based on Y position)
-                if (y < window.innerHeight * 0.15) {
-                    // Top Zone
-                    scrollContainer.scrollBy(0, -15);
+                // Smooth Scroll Zones
+                if (y < window.innerHeight * 0.18) {
+                    scrollContainer.scrollBy(0, -12);
                     zoneTop.classList.add('active-zone');
                     zoneBottom.classList.remove('active-zone');
-                } else if (y > window.innerHeight * 0.85) {
-                    // Bottom Zone
-                    scrollContainer.scrollBy(0, 15);
+                } else if (y > window.innerHeight * 0.82) {
+                    scrollContainer.scrollBy(0, 12);
                     zoneBottom.classList.add('active-zone');
                     zoneTop.classList.remove('active-zone');
                 } else {
@@ -202,52 +300,21 @@
                 }
 
             } else {
-                statusText.innerText = "WAVE HAND TO START";
-                statusText.style.color = "white";
+                statusText.innerText = "STANDBY: WAVE HAND TO SYNC";
+                statusText.style.color = "#94a3b8";
             }
             canvasCtx.restore();
         }
 
-        function triggerClick(x, y) {
-            // Find element at position and click it
-            const el = document.elementFromPoint(x, y);
-            if (el) el.click();
-        }
-
-        function checkHover(x, y) {
-            // Add hover effect manually since real mouse isn't moving
-            const el = document.elementFromPoint(x, y);
-            document.querySelectorAll('.interactive-btn').forEach(b => b.classList.remove('hovered'));
-            
-            if (el && el.classList.contains('interactive-btn')) {
-                el.classList.add('hovered');
-            }
-        }
-
-        // Initialize MediaPipe Hands
-        const hands = new Hands({locateFile: (file) => {
-            return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
-        }});
-
-        hands.setOptions({
-            maxNumHands: 1,
-            modelComplexity: 1,
-            minDetectionConfidence: 0.7,
-            minTrackingConfidence: 0.7
-        });
-
+        const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.75, minTrackingConfidence: 0.75 });
         hands.onResults(onResults);
 
-        // Start Camera
         const camera = new Camera(videoElement, {
-            onFrame: async () => {
-                await hands.send({image: videoElement});
-            },
-            width: 320,
-            height: 240
+            onFrame: async () => { await hands.send({image: videoElement}); },
+            width: 320, height: 240
         });
         camera.start();
-
     </script>
 </body>
 </html>
