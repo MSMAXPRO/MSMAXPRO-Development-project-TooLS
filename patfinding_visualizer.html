@@ -2,47 +2,100 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Pocket Budget</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pocket Ledger - CodeWithMsMaxPro</title>
     <style>
-        body {
-            background-color: #f7f7f7;
-            font-family: 'Segoe UI', sans-serif;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
+        /* Website Theme Variables */
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --primary-purple: #8b5cf6;
+            --text-white: #f8fafc;
+            --accent-glow: rgba(139, 92, 246, 0.4);
+            --success-green: #10b981;
+            --error-red: #f43f5e;
+        }
+
+        * {
             margin: 0;
-            padding-top: 50px;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 35px 35px;
+            color: var(--text-white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 15px;
+        }
+
+        .header-box {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .web-link {
+            color: var(--primary-purple);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
         }
 
         .container {
-            width: 350px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            height: fit-content;
+            width: 100%;
+            max-width: 400px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
-
-        h2 { text-align: center; margin-top: 0; }
 
         .balance-container {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid var(--accent-glow);
+        }
+
+        .balance-container h4 {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
         }
 
         .balance-val {
-            font-size: 2rem;
-            font-weight: bold;
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--text-white);
+            text-shadow: 0 0 10px rgba(255,255,255,0.2);
         }
 
         .inc-exp-container {
-            background: #fff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 20px;
             display: flex;
-            justify-content: space-between;
-            margin: 20px 0;
-            border-radius: 5px;
+            background: rgba(15, 23, 42, 0.3);
+            padding: 20px;
+            border-radius: 18px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
         .inc-exp-container > div {
@@ -51,113 +104,142 @@
         }
 
         .inc-exp-container > div:first-of-type {
-            border-right: 1px solid #dedede;
+            border-right: 1px solid rgba(255,255,255,0.1);
         }
 
-        .money { font-size: 1.2rem; font-weight: bold; }
-        .plus { color: #2ecc71; }
-        .minus { color: #c0392b; }
+        .money { font-size: 1.1rem; font-weight: 800; }
+        .plus { color: var(--success-green); }
+        .minus { color: var(--error-red); }
 
-        h3 { border-bottom: 1px solid #bbb; padding-bottom: 10px; margin: 30px 0 10px; }
+        h3 { 
+            font-size: 0.85rem; 
+            color: var(--primary-purple); 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            margin: 25px 0 15px;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+            padding-bottom: 8px;
+        }
 
         .list {
             list-style-type: none;
-            padding: 0;
-            margin-bottom: 30px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 25px;
+            padding-right: 5px;
         }
+
+        .list::-webkit-scrollbar { width: 4px; }
+        .list::-webkit-scrollbar-thumb { background: var(--primary-purple); border-radius: 10px; }
 
         .list li {
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            color: #333;
+            background: #0f172a;
+            color: var(--text-white);
             display: flex;
             justify-content: space-between;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            position: relative;
+            padding: 12px 15px;
+            margin: 8px 0;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            border-right: 5px solid transparent;
         }
 
-        .list li.plus { border-right: 5px solid #2ecc71; }
-        .list li.minus { border-right: 5px solid #c0392b; }
+        .list li.plus { border-right-color: var(--success-green); }
+        .list li.minus { border-right-color: var(--error-red); }
 
-        /* Form styling */
-        .form-control { margin-bottom: 10px; }
-        label { display: block; margin-bottom: 5px; font-size: 0.9rem; }
+        .form-control { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-size: 0.75rem; color: #94a3b8; font-weight: 700; }
         
         input, select {
-            border: 1px solid #dedede;
-            border-radius: 5px;
-            display: block;
-            font-size: 16px;
-            padding: 10px;
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            padding: 12px;
             width: 100%;
-            box-sizing: border-box;
-            background-color: white;
+            font-size: 0.95rem;
+            transition: 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 10px var(--accent-glow);
         }
 
         .btn {
-            background-color: #9c88ff;
+            background: var(--primary-purple);
             color: white;
             border: none;
-            display: block;
             width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            margin-top: 20px;
-            border-radius: 5px;
+            padding: 15px;
+            font-size: 1rem;
+            font-weight: 800;
+            margin-top: 15px;
+            border-radius: 12px;
             cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px var(--accent-glow);
+            filter: brightness(1.1);
         }
     </style>
 </head>
 <body>
 
+    <div class="header-box">
+        <h1>Wallet Node v2.0</h1>
+        <a href="https://codewithmsmaxpro.me" class="web-link">codewithmsmaxpro.me</a>
+    </div>
+
     <div class="container">
-        <h2>Expense Tracker</h2>
-        
         <div class="balance-container">
-            <h4>YOUR BALANCE</h4>
-            <div class="balance-val" id="balance">$0.00</div>
+            <h4>NET LIQUIDITY</h4>
+            <div class="balance-val" id="balance">₹0.00</div>
         </div>
 
         <div class="inc-exp-container">
             <div>
-                <h4>INCOME</h4>
-                <p class="money plus" id="money-plus">+$0.00</p>
+                <h4 style="font-size: 0.6rem; color: #94a3b8; margin-bottom: 5px;">INCOME</h4>
+                <p class="money plus" id="money-plus">+₹0.00</p>
             </div>
             <div>
-                <h4>EXPENSE</h4>
-                <p class="money minus" id="money-minus">-$0.00</p>
+                <h4 style="font-size: 0.6rem; color: #94a3b8; margin-bottom: 5px;">EXPENSE</h4>
+                <p class="money minus" id="money-minus">-₹0.00</p>
             </div>
         </div>
 
-        <h3>History</h3>
+        <h3>Transaction Logs</h3>
         <ul id="list" class="list">
-            <!-- Items added by JS -->
-        </ul>
+            </ul>
 
-        <h3>Add Transaction</h3>
+        <h3>New Transaction</h3>
         
-        <!-- NEW: Category Selector -->
         <div class="form-control">
             <label>Type</label>
             <select id="type">
-                <option value="expense">Expense (Kharcha)</option>
-                <option value="income">Income (Aamdani)</option>
+                <option value="expense">Expense (Debit)</option>
+                <option value="income">Income (Credit)</option>
             </select>
         </div>
 
         <div class="form-control">
-            <label>Text</label>
-            <input type="text" id="text" placeholder="Enter text...">
+            <label>Description</label>
+            <input type="text" id="text" placeholder="e.g. Server Rent, Coffee...">
         </div>
         
         <div class="form-control">
-            <label>Amount</label>
-            <input type="number" id="amount" placeholder="Enter amount...">
+            <label>Amount (₹)</label>
+            <input type="number" id="amount" placeholder="0.00">
         </div>
         
-        <button class="btn" onclick="addTransaction()">Add Transaction</button>
+        <button class="btn" onclick="addTransaction()">Push to Ledger</button>
     </div>
 
     <script>
@@ -167,31 +249,26 @@
         const list = document.getElementById('list');
         const text = document.getElementById('text');
         const amount = document.getElementById('amount');
-        const typeSelect = document.getElementById('type'); // New
+        const typeSelect = document.getElementById('type');
 
-        // Initial Data
         let transactions = [];
 
         function addTransaction() {
             if (text.value.trim() === '' || amount.value.trim() === '') {
-                alert('Please add a text and amount');
+                alert('Analysis failed: Data fields are empty.');
                 return;
             }
 
-            // Get selected type (income or expense)
             const type = typeSelect.value;
-            let amountValue = +amount.value; // Convert string to number
-
-            // Logic: Always treat input as positive first, then decide sign based on type
+            let amountValue = +amount.value;
             amountValue = Math.abs(amountValue); 
 
             if (type === 'expense') {
-                amountValue = -amountValue; // Make negative for expense
+                amountValue = -amountValue;
             }
-            // else: stays positive for income
 
             const transaction = {
-                id: generateID(),
+                id: Math.floor(Math.random() * 100000000),
                 text: text.value,
                 amount: amountValue
             };
@@ -204,12 +281,7 @@
             amount.value = '';
         }
 
-        function generateID() {
-            return Math.floor(Math.random() * 100000000);
-        }
-
         function addTransactionDOM(transaction) {
-            // Get sign
             const sign = transaction.amount < 0 ? '-' : '+';
             const itemClass = transaction.amount < 0 ? 'minus' : 'plus';
 
@@ -219,29 +291,21 @@
             const absAmount = Math.abs(transaction.amount);
 
             item.innerHTML = `
-                ${transaction.text} <span>${sign}$${absAmount}</span>
+                ${transaction.text} <span>${sign}₹${absAmount.toLocaleString()}</span>
             `;
 
-            list.appendChild(item);
+            list.insertBefore(item, list.firstChild); // Newest on top
         }
 
         function updateValues() {
             const amounts = transactions.map(t => t.amount);
-
             const total = amounts.reduce((acc, item) => (acc += item), 0).toFixed(2);
-            
-            const income = amounts
-                .filter(item => item > 0)
-                .reduce((acc, item) => (acc += item), 0)
-                .toFixed(2);
+            const income = amounts.filter(item => item > 0).reduce((acc, item) => (acc += item), 0).toFixed(2);
+            const expense = (amounts.filter(item => item < 0).reduce((acc, item) => (acc += item), 0) * -1).toFixed(2);
 
-            const expense = (
-                amounts.filter(item => item < 0).reduce((acc, item) => (acc += item), 0) * -1
-            ).toFixed(2);
-
-            balance.innerText = `$${total}`;
-            money_plus.innerText = `+$${income}`;
-            money_minus.innerText = `-$${expense}`;
+            balance.innerText = `₹${parseFloat(total).toLocaleString()}`;
+            money_plus.innerText = `+₹${parseFloat(income).toLocaleString()}`;
+            money_minus.innerText = `-₹${parseFloat(expense).toLocaleString()}`;
         }
     </script>
 </body>
