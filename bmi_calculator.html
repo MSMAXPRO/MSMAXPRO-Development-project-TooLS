@@ -3,32 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart BMI Calc</title>
+    <title>Premium BMI Calculator - CodeWithMsMaxPro</title>
     <style>
+        /* Website Theme Variables */
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --primary-purple: #8b5cf6;
+            --text-white: #f8fafc;
+            --accent-glow: rgba(139, 92, 246, 0.4);
+            --input-focus: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+        }
+
         body {
-            background-color: #111827;
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            background-color: var(--bg-dark);
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: var(--text-white);
+            flex-direction: column;
+        }
+
+        .header-box {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .web-link {
+            color: var(--primary-purple);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
         }
 
         .card {
-            background-color: #1f2937;
+            background-color: var(--card-bg);
             padding: 2.5rem;
-            border-radius: 1.5rem;
-            width: 350px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            border-radius: 24px;
+            width: 380px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
             text-align: center;
-        }
-
-        h2 {
-            margin-top: 0;
-            color: #38bdf8;
-            letter-spacing: 1px;
         }
 
         .input-group {
@@ -39,102 +72,113 @@
         label {
             display: block;
             margin-bottom: 8px;
-            color: #9ca3af;
-            font-size: 0.9rem;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
         }
 
         input {
             width: 100%;
-            padding: 12px;
-            background: #374151;
-            border: 2px solid transparent;
-            border-radius: 8px;
+            padding: 14px;
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
             color: white;
             font-size: 1rem;
-            box-sizing: border-box;
             transition: 0.3s;
         }
 
         input:focus {
             outline: none;
-            border-color: #38bdf8;
-            background: #4b5563;
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 10px var(--accent-glow);
+            background: var(--input-focus);
         }
 
         button {
             width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+            padding: 16px;
+            background: var(--primary-purple);
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             color: white;
-            font-size: 1.1rem;
-            font-weight: bold;
+            font-size: 1rem;
+            font-weight: 800;
             cursor: pointer;
-            transition: transform 0.1s;
-            margin-top: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        button:active {
-            transform: scale(0.98);
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--accent-glow);
+            filter: brightness(1.1);
         }
 
         #result-box {
             margin-top: 30px;
             padding: 20px;
-            border-radius: 12px;
-            background: #111827;
-            display: none; /* Hidden by default */
-            animation: fadeIn 0.5s ease;
+            border-radius: 16px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--accent-glow);
+            display: none;
+            animation: slideUp 0.5s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .bmi-value {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin: 10px 0;
+            font-size: 3rem;
+            font-weight: 900;
+            margin: 5px 0;
+            color: var(--primary-purple);
         }
 
         .status {
-            font-size: 1rem;
+            font-size: 0.9rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: bold;
+            letter-spacing: 2px;
+            font-weight: 700;
         }
 
-        /* Status Colors */
-        .underweight { color: #fbbf24; } /* Yellow */
-        .normal { color: #4ade80; }      /* Green */
-        .overweight { color: #f97316; }  /* Orange */
-        .obese { color: #ef4444; }       /* Red */
+        /* Logic Based Colors */
+        .underweight { color: #fbbf24; } 
+        .normal { color: #22c55e; }      
+        .overweight { color: #f97316; }  
+        .obese { color: #f43f5e; }       
 
     </style>
 </head>
 <body>
 
+    <div class="header-box">
+        <h1>Health Metrics</h1>
+        <a href="https://codewithmsmaxpro.me" class="web-link">codewithmsmaxpro.me</a>
+    </div>
+
     <div class="card">
-        <h2>BMI CALCULATOR</h2>
-        
         <div class="input-group">
             <label>Height (cm)</label>
-            <input type="number" id="height" placeholder="e.g. 175">
+            <input type="number" id="height" placeholder="Enter height in cm">
         </div>
 
         <div class="input-group">
             <label>Weight (kg)</label>
-            <input type="number" id="weight" placeholder="e.g. 70">
+            <input type="number" id="weight" placeholder="Enter weight in kg">
         </div>
 
-        <button onclick="calculateBMI()">Calculate BMI</button>
+        <button onclick="calculateBMI()">Analyze Score</button>
 
         <div id="result-box">
-            <div style="color: #9ca3af; font-size: 0.9rem;">Your BMI Score</div>
+            <div style="color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Body Mass Index</div>
             <div class="bmi-value" id="bmi-val">0.0</div>
-            <div class="status" id="bmi-status">Normal</div>
+            <div class="status" id="bmi-status">Calculating...</div>
         </div>
     </div>
 
@@ -146,38 +190,31 @@
             const valDisplay = document.getElementById('bmi-val');
             const statusDisplay = document.getElementById('bmi-status');
 
-            if (h === '' || w === '') {
-                alert("Please enter both height and weight!");
+            if (h === '' || w === '' || h <= 0 || w <= 0) {
+                alert("Please enter valid positive values!");
                 return;
             }
 
-            // Convert cm to meters
-            const heightInMeters = h / 100;
-            const bmi = (w / (heightInMeters * heightInMeters)).toFixed(1);
+            const bmi = (w / ((h / 100) ** 2)).toFixed(1);
 
-            // Show result box
             resultBox.style.display = 'block';
             valDisplay.textContent = bmi;
 
-            // Determine Status and Color
-            valDisplay.className = 'bmi-value'; // Reset classes
+            // Clean previous status classes
             statusDisplay.className = 'status';
+            valDisplay.style.color = "var(--primary-purple)"; 
 
             if (bmi < 18.5) {
                 statusDisplay.textContent = "Underweight";
-                valDisplay.classList.add('underweight');
                 statusDisplay.classList.add('underweight');
             } else if (bmi >= 18.5 && bmi < 24.9) {
-                statusDisplay.textContent = "Normal Weight";
-                valDisplay.classList.add('normal');
+                statusDisplay.textContent = "Healthy Weight";
                 statusDisplay.classList.add('normal');
             } else if (bmi >= 25 && bmi < 29.9) {
                 statusDisplay.textContent = "Overweight";
-                valDisplay.classList.add('overweight');
                 statusDisplay.classList.add('overweight');
             } else {
-                statusDisplay.textContent = "Obese";
-                valDisplay.classList.add('obese');
+                statusDisplay.textContent = "Obese Condition";
                 statusDisplay.classList.add('obese');
             }
         }
