@@ -3,82 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MSMAXPRO Calculator 2.0</title>
+    <title>MSMAXPRO Calc 2.0 - CodeWithMsMaxPro</title>
     <style>
-        /* General Styling for Premium Look */
+        /* Website Theme Variables */
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --primary-purple: #8b5cf6;
+            --text-white: #f8fafc;
+            --accent-glow: rgba(139, 92, 246, 0.4);
+            --error-red: #f43f5e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            background-color: var(--bg-dark);
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 35px 35px;
+            color: var(--text-white);
+            flex-direction: column;
         }
 
-        .calculator-card {
-            background-color: #1e1e1e;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            width: 100%;
-            max-width: 400px;
+        .header-box {
             text-align: center;
-            border: 1px solid #333;
+            margin-bottom: 25px;
         }
 
         h1 {
-            color: #00e5ff; /* Cyan color for title */
-            margin-bottom: 20px;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             text-transform: uppercase;
             letter-spacing: 2px;
+            text-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .web-link {
+            color: var(--primary-purple);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .calculator-card {
+            background-color: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 24px;
+            width: 380px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            text-align: center;
         }
 
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-align: left;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
-            color: #aaa;
-            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
         }
 
         input[type="number"] {
             width: 100%;
-            padding: 10px;
-            background-color: #2d2d2d;
-            border: 1px solid #444;
+            padding: 14px;
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
             color: white;
-            border-radius: 5px;
-            font-size: 1rem;
-            box-sizing: border-box; /* Ensures padding doesn't affect width */
+            font-size: 1.1rem;
+            transition: 0.3s;
         }
 
         input[type="number"]:focus {
             outline: none;
-            border-color: #00e5ff;
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 10px var(--accent-glow);
         }
 
         .buttons-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 20px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 25px;
         }
 
         button {
-            padding: 15px;
+            padding: 16px;
             border: none;
-            border-radius: 8px;
-            font-size: 1.2rem;
+            border-radius: 12px;
+            font-size: 1.3rem;
             cursor: pointer;
-            transition: transform 0.1s, background-color 0.2s;
-            font-weight: bold;
+            transition: all 0.2s ease;
+            font-weight: 800;
         }
 
         button:active {
@@ -86,32 +117,41 @@
         }
 
         .btn-op {
-            background-color: #333;
-            color: #00e5ff;
+            background-color: #334155;
+            color: var(--primary-purple);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .btn-op:hover {
-            background-color: #444;
+            background-color: var(--primary-purple);
+            color: white;
+            box-shadow: 0 0 15px var(--accent-glow);
         }
 
         .btn-clear {
             grid-column: span 2;
-            background-color: #ff3d00; /* Red for clear */
-            color: white;
+            background-color: transparent;
+            color: var(--error-red);
+            border: 1px solid var(--error-red);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             margin-top: 10px;
         }
 
         .btn-clear:hover {
-            background-color: #ff6333;
+            background-color: var(--error-red);
+            color: white;
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.3);
         }
 
         #result-area {
-            margin-top: 25px;
-            padding: 15px;
-            background-color: #000;
-            border-radius: 8px;
-            border: 1px solid #333;
-            min-height: 50px;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: rgba(15, 23, 42, 0.8);
+            border-radius: 16px;
+            border: 1px solid var(--accent-glow);
+            min-height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -119,35 +159,44 @@
         }
 
         .result-label {
-            color: #666;
-            font-size: 0.8rem;
+            color: #94a3b8;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             margin-bottom: 5px;
         }
 
         .result-value {
-            color: #00e5ff;
-            font-size: 1.5rem;
-            font-weight: bold;
+            color: var(--primary-purple);
+            font-size: 1.8rem;
+            font-weight: 900;
+            text-shadow: 0 0 10px var(--accent-glow);
         }
 
         .error {
-            color: #ff3d00;
+            color: var(--error-red);
+            font-size: 0.9rem;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
 
-    <div class="calculator-card">
+    <div class="header-box">
         <h1>MSMAXPRO Calc 2.0</h1>
+        <a href="https://codewithmsmaxpro.me" class="web-link">codewithmsmaxpro.me</a>
+    </div>
 
+    <div class="calculator-card">
         <div class="input-group">
-            <label for="num1">First Number:</label>
-            <input type="number" id="num1" placeholder="Enter number...">
+            <label for="num1">Input A</label>
+            <input type="number" id="num1" placeholder="0">
         </div>
 
         <div class="input-group">
-            <label for="num2">Second Number:</label>
-            <input type="number" id="num2" placeholder="Enter number...">
+            <label for="num2">Input B</label>
+            <input type="number" id="num2" placeholder="0">
         </div>
 
         <div class="buttons-grid">
@@ -156,57 +205,44 @@
             <button class="btn-op" onclick="calculate('*')">×</button>
             <button class="btn-op" onclick="calculate('/')">÷</button>
             
-            <button class="btn-clear" onclick="clearFields()">Clear / Reset</button>
+            <button class="btn-clear" onclick="clearFields()">Reset System</button>
         </div>
 
         <div id="result-area">
-            <span class="result-label">RESULT</span>
+            <span class="result-label">Output Result</span>
             <span id="result-value" class="result-value">---</span>
         </div>
     </div>
 
     <script>
         function calculate(operation) {
-            // Get values from inputs
             const n1Input = document.getElementById('num1').value;
             const n2Input = document.getElementById('num2').value;
             const resultDisplay = document.getElementById('result-value');
 
-            // Validation: Check if inputs are empty
             if (n1Input === '' || n2Input === '') {
-                resultDisplay.innerHTML = '<span class="error">Please enter both numbers</span>';
+                resultDisplay.innerHTML = '<span class="error">MISSING INPUTS</span>';
                 return;
             }
 
-            // Convert string inputs to floats (numbers)
             const num1 = parseFloat(n1Input);
             const num2 = parseFloat(n2Input);
             let result = 0;
 
-            // Math Logic (Switch Case similar to Python Match)
             switch (operation) {
-                case '+':
-                    result = num1 + num2;
-                    break;
-                case '-':
-                    result = num1 - num2;
-                    break;
-                case '*':
-                    result = num1 * num2;
-                    break;
+                case '+': result = num1 + num2; break;
+                case '-': result = num1 - num2; break;
+                case '*': result = num1 * num2; break;
                 case '/':
                     if (num2 === 0) {
-                        resultDisplay.innerHTML = '<span class="error">Cannot divide by Zero!</span>';
+                        resultDisplay.innerHTML = '<span class="error">DIV BY ZERO ERR</span>';
                         return;
                     }
                     result = num1 / num2;
                     break;
-                default:
-                    return;
+                default: return;
             }
 
-            // Display Result (rounded to 2 decimal places if needed)
-            // Using logic to avoid .00 if it's an integer
             if (Number.isInteger(result)) {
                 resultDisplay.textContent = result;
             } else {
