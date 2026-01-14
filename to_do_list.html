@@ -3,112 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Task Master</title>
+    <title>Neon Tasks - CodeWithMsMaxPro</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        /* Website Theme Variables */
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --primary-purple: #8b5cf6;
+            --text-white: #f8fafc;
+            --accent-glow: rgba(139, 92, 246, 0.4);
+            --success-green: #4ade80;
+            --error-red: #f87171;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+        }
+
         body {
-            background-color: #090909;
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.03) 1px, transparent 0);
+            background-size: 40px 40px;
+            color: var(--text-white);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
-            overflow-y: auto;
+            padding: 30px 15px;
         }
 
-        .container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 0 20px rgba(138, 43, 226, 0.2);
+        .header-box {
+            text-align: center;
+            margin-bottom: 30px;
         }
 
         h1 {
-            text-align: center;
-            color: #d8b4fe;
-            text-shadow: 0 0 10px #a855f7;
-            margin-bottom: 20px;
-            font-weight: 300;
+            font-size: 1.8rem;
+            text-transform: uppercase;
             letter-spacing: 2px;
+            text-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .web-link {
+            color: var(--primary-purple);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--primary-purple);
+            margin-bottom: 25px;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
         }
 
         .input-group {
             display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
+            gap: 12px;
+            margin-bottom: 30px;
         }
 
         input {
             flex: 1;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid #333;
-            background: #1a1a1a;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #0f172a;
             color: white;
             outline: none;
             transition: 0.3s;
+            font-size: 0.95rem;
         }
 
         input:focus {
-            border-color: #a855f7;
-            box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 10px var(--accent-glow);
         }
 
         button#add-btn {
-            background: #a855f7;
+            background: var(--primary-purple);
             border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
+            padding: 0 18px;
+            border-radius: 12px;
             color: white;
             cursor: pointer;
-            transition: 0.3s;
-            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
         }
 
         button#add-btn:hover {
-            background: #9333ea;
-            box-shadow: 0 0 15px #9333ea;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--accent-glow);
         }
 
         ul {
             list-style: none;
             padding: 0;
+            max-height: 350px;
+            overflow-y: auto;
+            padding-right: 5px;
         }
 
+        ul::-webkit-scrollbar { width: 4px; }
+        ul::-webkit-scrollbar-thumb { background: var(--primary-purple); border-radius: 10px; }
+
         li {
-            background: #1a1a1a;
-            margin-bottom: 10px;
-            padding: 15px;
-            border-radius: 10px;
+            background: rgba(15, 23, 42, 0.5);
+            margin-bottom: 12px;
+            padding: 16px;
+            border-radius: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.3s ease;
-            border-left: 4px solid #a855f7;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 4px solid var(--primary-purple);
             animation: slideIn 0.3s ease;
         }
 
         @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         li.completed {
+            background: rgba(15, 23, 42, 0.2);
             text-decoration: line-through;
-            color: #555;
-            border-left-color: #555;
-            opacity: 0.7;
+            color: #64748b;
+            border-left-color: #334155;
+            opacity: 0.6;
         }
 
         .actions {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
         .btn-action {
@@ -119,27 +164,31 @@
             transition: 0.2s;
         }
 
-        .check-btn { color: #4ade80; }
-        .check-btn:hover { text-shadow: 0 0 10px #4ade80; transform: scale(1.1); }
+        .check-btn { color: var(--success-green); }
+        .check-btn:hover { transform: scale(1.2); filter: drop-shadow(0 0 5px var(--success-green)); }
 
-        .trash-btn { color: #f87171; }
-        .trash-btn:hover { text-shadow: 0 0 10px #f87171; transform: scale(1.1); }
+        .trash-btn { color: var(--error-red); }
+        .trash-btn:hover { transform: scale(1.2); filter: drop-shadow(0 0 5px var(--error-red)); }
 
     </style>
 </head>
 <body>
 
+<div class="header-box">
+    <h1>MSMAXPRO Tasks</h1>
+    <a href="https://codewithmsmaxpro.me" class="web-link">codewithmsmaxpro.me</a>
+</div>
+
 <div class="container">
-    <h1>NEON TASKS</h1>
+    <h2>Mission Control</h2>
     
     <div class="input-group">
-        <input type="text" id="taskInput" placeholder="Add a new mission...">
+        <input type="text" id="taskInput" placeholder="Add a new objective...">
         <button id="add-btn"><i class="fas fa-plus"></i></button>
     </div>
 
     <ul id="taskList">
-        <!-- Tasks will appear here -->
-    </ul>
+        </ul>
 </div>
 
 <script>
@@ -147,12 +196,22 @@
     const addBtn = document.getElementById('add-btn');
     const list = document.getElementById('taskList');
 
-    // Add Task Function
+    // Load Tasks from LocalStorage
+    document.addEventListener('DOMContentLoaded', getTasks);
+
     function addTask() {
-        const text = input.value;
+        const text = input.value.trim();
         if (text === '') return;
 
+        createTaskElement(text, false);
+        saveLocalTasks(text, false);
+        input.value = '';
+    }
+
+    function createTaskElement(text, isCompleted) {
         const li = document.createElement('li');
+        if (isCompleted) li.classList.add('completed');
+        
         li.innerHTML = `
             <span>${text}</span>
             <div class="actions">
@@ -161,31 +220,49 @@
             </div>
         `;
         
-        list.prepend(li); // Add to top
-        input.value = '';
+        list.prepend(li);
     }
 
-    // Event Listeners
     addBtn.addEventListener('click', addTask);
-    
-    input.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') addTask();
-    });
+    input.addEventListener('keypress', (e) => { if (e.key === 'Enter') addTask(); });
 
-    // Toggle Complete
-    window.toggleTask = function(btn) {
+    function toggleTask(btn) {
         const item = btn.closest('li');
         item.classList.toggle('completed');
+        updateLocalTasks();
     }
 
-    // Delete Task
-    window.deleteTask = function(btn) {
+    function deleteTask(btn) {
         const item = btn.closest('li');
-        item.style.transform = 'translateX(50px)';
+        item.style.transform = 'scale(0.8)';
         item.style.opacity = '0';
         setTimeout(() => {
             item.remove();
+            updateLocalTasks();
         }, 300);
+    }
+
+    // Local Storage Logic
+    function saveLocalTasks(task, status) {
+        let tasks = localStorage.getItem('msmaxpro_tasks') ? JSON.parse(localStorage.getItem('msmaxpro_tasks')) : [];
+        tasks.push({ text: task, completed: status });
+        localStorage.setItem('msmaxpro_tasks', JSON.stringify(tasks));
+    }
+
+    function getTasks() {
+        let tasks = localStorage.getItem('msmaxpro_tasks') ? JSON.parse(localStorage.getItem('msmaxpro_tasks')) : [];
+        tasks.forEach(task => createTaskElement(task.text, task.completed));
+    }
+
+    function updateLocalTasks() {
+        let tasks = [];
+        document.querySelectorAll('#taskList li').forEach(li => {
+            tasks.push({
+                text: li.querySelector('span').innerText,
+                completed: li.classList.contains('completed')
+            });
+        });
+        localStorage.setItem('msmaxpro_tasks', JSON.stringify(tasks.reverse()));
     }
 </script>
 
