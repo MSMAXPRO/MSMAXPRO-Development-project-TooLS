@@ -2,90 +2,159 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Minimal Analog Clock</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Analog Clock - CodeWithMsMaxPro</title>
     <style>
+        /* Website Theme Variables */
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --primary-purple: #8b5cf6;
+            --text-white: #f8fafc;
+            --accent-glow: rgba(139, 92, 246, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+        }
+
         body {
-            background-color: #e0e5ec;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            background-color: var(--bg-dark);
+            /* Website Grid Pattern */
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            color: var(--text-white);
+            flex-direction: column;
+        }
+
+        .header-box {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            text-shadow: 0 0 15px var(--accent-glow);
+            margin-bottom: 5px;
+        }
+
+        .web-link {
+            color: var(--primary-purple);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
         }
 
         .clock {
-            width: 300px;
-            height: 300px;
-            background-color: #e0e5ec;
+            width: 320px;
+            height: 320px;
+            background: var(--card-bg);
             border-radius: 50%;
-            border: 10px solid #e0e5ec;
-            box-shadow: 
-                15px 15px 30px #a3b1c6, 
-                -15px -15px 30px #ffffff; /* Neumorphism Effect */
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                        0 0 20px var(--accent-glow);
             position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* Center Point */
+        /* Inner Glow Circle */
+        .clock::before {
+            content: '';
+            position: absolute;
+            width: 95%;
+            height: 95%;
+            border-radius: 50%;
+            background: radial-gradient(circle, transparent 60%, rgba(139, 92, 246, 0.05) 100%);
+        }
+
+        /* Center Point (Neon Style) */
         .clock::after {
             content: '';
-            width: 15px;
-            height: 15px;
-            background: #ff3d00;
+            width: 12px;
+            height: 12px;
+            background: var(--primary-purple);
             border-radius: 50%;
             position: absolute;
             z-index: 10;
+            box-shadow: 0 0 10px var(--primary-purple);
         }
 
         .hand {
             position: absolute;
             bottom: 50%;
             left: 50%;
-            transform-origin: bottom; /* Rotate from the bottom center */
+            transform-origin: bottom;
             border-radius: 10px;
-            transform: translateX(-50%); /* Center horizontally */
+            transform: translateX(-50%);
         }
 
         .hour {
-            width: 6px;
-            height: 70px;
-            background: #333;
+            width: 7px;
+            height: 75px;
+            background: var(--text-white);
             z-index: 5;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
         }
 
         .minute {
             width: 4px;
-            height: 100px;
-            background: #555;
+            height: 105px;
+            background: #94a3b8;
             z-index: 6;
         }
 
         .second {
             width: 2px;
-            height: 120px;
-            background: #ff3d00;
+            height: 125px;
+            background: var(--primary-purple);
             z-index: 7;
+            box-shadow: 0 0 8px var(--primary-purple);
         }
 
-        /* Numbers */
+        /* Numbers in Website Font Style */
         .number {
             position: absolute;
-            font-family: 'Arial', sans-serif;
-            font-weight: bold;
-            font-size: 1.2rem;
-            color: #555;
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: #475569;
             text-align: center;
         }
-        .n12 { top: 15px; }
-        .n3  { right: 20px; }
-        .n6  { bottom: 15px; }
-        .n9  { left: 20px; }
 
+        .n12 { top: 25px; color: var(--text-white); }
+        .n3  { right: 25px; }
+        .n6  { bottom: 25px; }
+        .n9  { left: 25px; }
+
+        /* Digital Display add-on */
+        .digital-time {
+            margin-top: 40px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-purple);
+            background: rgba(139, 92, 246, 0.1);
+            padding: 10px 25px;
+            border-radius: 30px;
+            border: 1px solid var(--accent-glow);
+        }
     </style>
 </head>
 <body>
+
+    <div class="header-box">
+        <h1>Time Tracker</h1>
+        <a href="https://codewithmsmaxpro.me" class="web-link">codewithmsmaxpro.me</a>
+    </div>
 
     <div class="clock">
         <div class="number n12">12</div>
@@ -98,34 +167,36 @@
         <div class="hand second" id="second-hand"></div>
     </div>
 
+    <div class="digital-time" id="digital-clock">00:00:00</div>
+
     <script>
         const hourHand = document.getElementById('hour-hand');
         const minuteHand = document.getElementById('minute-hand');
         const secondHand = document.getElementById('second-hand');
+        const digitalClock = document.getElementById('digital-clock');
 
         function updateClock() {
             const now = new Date();
-            
+
             const seconds = now.getSeconds();
             const minutes = now.getMinutes();
             const hours = now.getHours();
 
-            // Calculate degrees
+            // Analog Calculation
             const secondsDegrees = ((seconds / 60) * 360);
             const minutesDegrees = ((minutes / 60) * 360) + ((seconds/60)*6);
             const hoursDegrees = ((hours / 12) * 360) + ((minutes/60)*30);
 
-            // Apply rotation
-            // Note: We subtract 50% via CSS transform usually, but here we need pure rotation
-            // We kept transform-origin: bottom.
-            
             secondHand.style.transform = `translateX(-50%) rotate(${secondsDegrees}deg)`;
             minuteHand.style.transform = `translateX(-50%) rotate(${minutesDegrees}deg)`;
             hourHand.style.transform = `translateX(-50%) rotate(${hoursDegrees}deg)`;
+
+            // Digital Update
+            digitalClock.innerText = now.toLocaleTimeString();
         }
 
         setInterval(updateClock, 1000);
-        updateClock(); // Run immediately
+        updateClock();
     </script>
 </body>
 </html>
