@@ -2,31 +2,79 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Gravity Sandbox</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics Sandbox - CodeWithMsMaxPro</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #111; font-family: sans-serif; }
-        canvas { display: block; }
+        /* Website Theme Variables */
+        :root {
+            --bg-dark: #0f172a;
+            --primary-purple: #8b5cf6;
+            --neon-cyan: #00f2ff;
+            --text-white: #f8fafc;
+            --accent-glow: rgba(139, 92, 246, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            background: var(--bg-dark); 
+            color: var(--text-white); 
+            font-family: 'Inter', 'Segoe UI', sans-serif; 
+            overflow: hidden; 
+        }
+
+        canvas { display: block; cursor: crosshair; }
+
         .instructions {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            color: #ccc;
-            background: rgba(0,0,0,0.5);
-            padding: 15px;
-            border-radius: 8px;
+            top: 25px;
+            left: 25px;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 100;
+        }
+
+        h2 { 
+            font-size: 1rem; 
+            margin-bottom: 10px; 
+            color: var(--primary-purple); 
+            text-transform: uppercase; 
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .controls-hint { font-size: 0.75rem; color: #94a3b8; line-height: 1.6; }
+        .stats { margin-top: 15px; font-weight: 800; color: var(--neon-cyan); font-size: 0.8rem; }
+
+        .branding {
+            position: absolute;
+            bottom: 25px;
+            right: 25px;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.2);
+            letter-spacing: 1px;
             pointer-events: none;
         }
-        h2 { margin: 0 0 5px 0; color: #ffeb3b; }
     </style>
 </head>
 <body>
 
 <div class="instructions">
-    <h2>PHYSICS SANDBOX</h2>
-    <p>Left Click: Spawn Balls</p>
-    <p>Right Click: Anti-Gravity Blast</p>
-    <p>Balls: <span id="count">0</span></p>
+    <h2>Kinetic Sandbox</h2>
+    <div class="controls-hint">
+        • <b>LEFT CLICK:</b> Manifest Matter<br>
+        • <b>RIGHT CLICK:</b> Gravity Reversal<br>
+        • <b>DRAG:</b> Rapid Deployment
+    </div>
+    <div class="stats">ACTIVE NODES: <span id="count">0</span></div>
 </div>
+
+<div class="branding">CODEWITHMSMAXPRO.ME | PHYSICS ENGINE v2.1</div>
 
 <canvas id="canvas"></canvas>
 
@@ -39,8 +87,9 @@
     canvas.height = window.innerHeight;
 
     let particles = [];
-    const friction = 0.95; // Energy loss on bounce
-    const gravity = 0.6;
+    let isMouseDown = false;
+    const friction = 0.92; // Energy absorption on impact
+    const gravity = 0.55;
 
     class Particle {
         constructor(x, y, radius, color, velocity) {
@@ -49,28 +98,29 @@
             this.radius = radius;
             this.color = color;
             this.velocity = velocity;
-            this.mass = 1;
         }
 
         draw() {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
             ctx.fillStyle = this.color;
-            ctx.shadowBlur = 10;
+            ctx.shadowBlur = 15;
             ctx.shadowColor = this.color;
             ctx.fill();
             ctx.closePath();
+            ctx.shadowBlur = 0;
         }
 
         update() {
-            // Check Floor Collision
+            // Floor Collision
             if (this.y + this.radius + this.velocity.y > canvas.height) {
                 this.velocity.y = -this.velocity.y * friction;
+                this.y = canvas.height - this.radius; // Snap to floor
             } else {
                 this.velocity.y += gravity;
             }
 
-            // Check Wall Collision
+            // Wall Collision
             if (this.x + this.radius + this.velocity.x > canvas.width || this.x - this.radius <= 0) {
                 this.velocity.x = -this.velocity.x * friction;
             }
@@ -82,52 +132,64 @@
         }
     }
 
-    function init() {
-        animate();
-    }
-
     function animate() {
         requestAnimationFrame(animate);
-        // Clear screen with trail effect
-        ctx.fillStyle = 'rgba(17, 17, 17, 0.4)';
+        // Motion Blur Effect
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.3)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        particles.forEach(particle => {
+        particles.forEach((particle, index) => {
             particle.update();
+            // Optimization: Remove if stuck at bottom with no velocity
+            if (Math.abs(particle.velocity.y) < 0.1 && particle.y > canvas.height - particle.radius - 1) {
+                // Keep them for visual, but we could splice if count > 200
+            }
         });
         
         countEl.textContent = particles.length;
     }
 
-    // Spawn on Click
+    function spawn(x, y) {
+        const radius = Math.random() * 8 + 4;
+        // Themed color palette: Purple, Cyan, White
+        const colors = ['#8b5cf6', '#00f2ff', '#ffffff', '#a855f7'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const velocity = {
+            x: (Math.random() - 0.5) * 12,
+            y: (Math.random() - 0.5) * 12
+        };
+        particles.push(new Particle(x, y, radius, color, velocity));
+        
+        // Performance guard: Remove oldest if > 150
+        if(particles.length > 150) particles.shift();
+    }
+
     window.addEventListener('mousedown', (e) => {
-        if (e.button === 0) { // Left Click
-            const radius = Math.random() * 10 + 5;
-            const color = `hsl(${Math.random() * 360}, 50%, 50%)`;
-            const velocity = {
-                x: (Math.random() - 0.5) * 15,
-                y: (Math.random() - 0.5) * 15
-            };
-            particles.push(new Particle(e.clientX, e.clientY, radius, color, velocity));
-        } else if (e.button === 2) { // Right Click
-            // Blast Effect
+        if (e.button === 0) { 
+            isMouseDown = true;
+            spawn(e.clientX, e.clientY);
+        } else if (e.button === 2) { 
+            // Gravity Blast
             particles.forEach(p => {
-                p.velocity.y -= 20;
-                p.velocity.x += (Math.random() - 0.5) * 20;
+                p.velocity.y -= 25;
+                p.velocity.x += (Math.random() - 0.5) * 30;
             });
         }
     });
 
-    // Disable context menu for right click
+    window.addEventListener('mousemove', (e) => {
+        if (isMouseDown) spawn(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('mouseup', () => isMouseDown = false);
     window.addEventListener('contextmenu', e => e.preventDefault());
 
-    // Resize
     window.addEventListener('resize', () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
     });
 
-    init();
+    animate();
 </script>
 </body>
 </html>
