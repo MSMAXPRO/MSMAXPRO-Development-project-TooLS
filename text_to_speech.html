@@ -2,77 +2,156 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Robot Voice Box</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Node - CodeWithMsMaxPro</title>
     <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Segoe UI', sans-serif;
+        /* Website Theme Variables */
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --primary-purple: #8b5cf6;
+            --text-white: #f8fafc;
+            --accent-glow: rgba(139, 92, 246, 0.4);
+        }
+
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 35px 35px;
+            color: var(--text-white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 15px;
+        }
+
+        .header-box {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .web-link {
+            color: var(--primary-purple);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
         }
 
         .container {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-            width: 400px;
+            width: 100%;
+            max-width: 450px;
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
 
-        h2 { color: #555; margin-top: 0; }
+        h2 { 
+            font-size: 1.2rem; 
+            color: var(--primary-purple); 
+            margin-bottom: 20px; 
+            text-transform: uppercase; 
+            letter-spacing: 2px;
+        }
 
         textarea {
             width: 100%;
-            height: 120px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            padding: 10px;
-            font-size: 1rem;
+            height: 140px;
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            font-size: 0.95rem;
+            color: white;
             resize: none;
             box-sizing: border-box;
             margin-bottom: 20px;
+            transition: 0.3s;
         }
         
-        textarea:focus { border-color: #764ba2; outline: none; }
+        textarea:focus { 
+            outline: none;
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
 
         select {
             width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            margin-bottom: 20px;
+            padding: 12px;
+            background: #0f172a;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            margin-bottom: 25px;
+            cursor: pointer;
+            outline: none;
         }
 
         button {
             width: 100%;
-            padding: 15px;
-            background: #764ba2;
+            padding: 16px;
+            background: var(--primary-purple);
             color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 800;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
         }
 
-        button:hover { background: #5b3a7d; }
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--accent-glow);
+            filter: brightness(1.1);
+        }
+
+        .status-msg {
+            margin-top: 15px;
+            font-size: 0.75rem;
+            color: #64748b;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
 
+    <div class="header-box">
+        <h1>Voice Node v1.0</h1>
+        <a href="https://codewithmsmaxpro.me" class="web-link">codewithmsmaxpro.me</a>
+    </div>
+
     <div class="container">
-        <h2>🗣️ Speak It!</h2>
-        <textarea id="text" placeholder="Type something here..."></textarea>
+        <h2>Neural Speech Synthesizer</h2>
+        <textarea id="text" placeholder="Enter text to translate into neural speech..."></textarea>
         
         <select id="voice-select">
-            <option value="">Loading Voices...</option>
+            <option value="">ACQUIRING VOICE CORES...</option>
         </select>
         
-        <button onclick="speak()">Speak Now</button>
+        <button onclick="speak()">Activate Speech</button>
+        <p class="status-msg">Powered by Local Web Speech Engine</p>
     </div>
 
     <script>
@@ -93,6 +172,7 @@
             });
         }
 
+        // Initialize voices
         populateVoices();
         if (speechSynthesis.onvoiceschanged !== undefined) {
             speechSynthesis.onvoiceschanged = populateVoices;
@@ -100,7 +180,7 @@
 
         function speak() {
             if (synth.speaking) {
-                console.error('Already speaking...');
+                console.error('Core occupied: Already synthesizing speech.');
                 return;
             }
             
@@ -114,7 +194,8 @@
                         utterThis.voice = voice;
                     }
                 });
-                
+
+                // Styling for "Talking" state can be added here
                 synth.speak(utterThis);
             }
         }
