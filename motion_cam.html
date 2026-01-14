@@ -2,56 +2,117 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Motion Sentry Security</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentry Node - CodeWithMsMaxPro</title>
     <style>
-        body { background: #222; color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        /* Website Theme Variables */
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --primary-purple: #8b5cf6;
+            --text-white: #f8fafc;
+            --error-red: #f43f5e;
+            --success-green: #10b981;
+            --accent-glow: rgba(139, 92, 246, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
         
-        .monitor { position: relative; border: 5px solid #333; border-radius: 10px; overflow: hidden; display: inline-block; box-shadow: 0 0 20px black; }
+        body { 
+            background: var(--bg-dark); 
+            color: var(--text-white); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 30px 15px;
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.03) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+
+        .header-box { text-align: center; margin-bottom: 30px; }
+        h1 { font-size: 1.8rem; text-transform: uppercase; letter-spacing: 3px; text-shadow: 0 0 15px var(--accent-glow); }
+        .web-link { color: var(--primary-purple); text-decoration: none; font-size: 0.8rem; font-weight: 600; }
+
+        .monitor-container { 
+            position: relative; 
+            background: #000;
+            border: 2px solid var(--card-bg); 
+            border-radius: 20px; 
+            overflow: hidden; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            max-width: 640px;
+            width: 100%;
+        }
         
-        video { display: block; transform: scaleX(-1); /* Mirror effect */ }
+        video { width: 100%; height: auto; display: block; transform: scaleX(-1); opacity: 0.7; }
         
         .status-badge {
-            position: absolute; top: 10px; left: 10px; padding: 5px 15px; border-radius: 4px; font-weight: bold; letter-spacing: 1px;
-            background: rgba(0,0,0,0.7); border: 1px solid #555; transition: 0.3s;
+            position: absolute; top: 20px; left: 20px; padding: 8px 16px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; letter-spacing: 1px;
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); transition: 0.3s;
         }
         
-        .recording { background: red; color: white; animation: pulse 1s infinite; border-color: red; }
-        .watching { background: #10b981; color: white; border-color: #10b981; }
+        .recording { border-color: var(--error-red); color: var(--error-red); animation: pulse 1s infinite; box-shadow: 0 0 15px rgba(244, 63, 94, 0.2); }
+        .watching { border-color: var(--success-green); color: var(--success-green); }
+
+        .controls-panel {
+            width: 100%; max-width: 640px; background: var(--card-bg); margin-top: 25px; padding: 20px; border-radius: 20px;
+            display: flex; gap: 20px; align-items: center; border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .slider-group { flex-grow: 1; display: flex; align-items: center; gap: 15px; }
+        input[type=range] { flex-grow: 1; accent-color: var(--primary-purple); cursor: pointer; }
+        label { font-size: 0.7rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
+
+        .btn-clear { background: transparent; border: 1px solid var(--error-red); color: var(--error-red); padding: 8px 15px; border-radius: 10px; font-size: 0.7rem; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .btn-clear:hover { background: var(--error-red); color: white; }
+
+        .log-section { width: 100%; max-width: 640px; margin-top: 30px; }
+        .log-header { font-size: 0.8rem; font-weight: 800; color: var(--primary-purple); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .log-header::after { content: ''; flex-grow: 1; height: 1px; background: rgba(139, 92, 246, 0.2); }
 
         .gallery {
-            margin-top: 20px; display: flex; gap: 10px; overflow-x: auto; width: 100%; max-width: 800px; padding: 10px; background: #333; border-radius: 10px; min-height: 120px; align-items: center;
+            display: flex; gap: 12px; overflow-x: auto; padding: 10px; background: rgba(15, 23, 42, 0.5); border-radius: 15px; min-height: 140px; align-items: center; border: 1px solid rgba(255,255,255,0.05);
         }
         
-        .snap { width: 150px; border: 2px solid white; border-radius: 5px; animation: flash 0.5s; }
+        .snap { height: 100px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); animation: flash 0.5s; transition: 0.3s; }
+        .snap:hover { transform: scale(1.05); border-color: var(--primary-purple); }
         
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        @keyframes flash { 0% { filter: brightness(2); } 100% { filter: brightness(1); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        @keyframes flash { 0% { filter: brightness(3) contrast(1.5); } 100% { filter: brightness(1); } }
 
-        .controls { margin-top: 10px; display: flex; gap: 15px; align-items: center; }
-        input[type=range] { width: 150px; }
-        label { font-size: 0.9rem; color: #ccc; }
+        /* Custom Scrollbar for Gallery */
+        .gallery::-webkit-scrollbar { height: 4px; }
+        .gallery::-webkit-scrollbar-thumb { background: var(--primary-purple); border-radius: 10px; }
     </style>
 </head>
 <body>
 
-    <h1 style="color: #ef4444; margin-bottom: 10px;">MOTION SENTRY</h1>
+    <div class="header-box">
+        <h1>Sentry Node v4.0</h1>
+        <a href="https://codewithmsmaxpro.me" class="web-link">codewithmsmaxpro.me</a>
+    </div>
     
-    <div class="monitor">
-        <video id="video" width="640" height="480" autoplay muted></video>
-        <div id="badge" class="status-badge watching">ARMED & WATCHING</div>
+    <div class="monitor-container">
+        <video id="video" width="640" height="480" autoplay muted playsinline></video>
+        <div id="badge" class="status-badge watching">SYSTEM ARMED</div>
         <canvas id="motionCanvas" width="640" height="480" style="display: none;"></canvas>
     </div>
 
-    <div class="controls">
-        <label>Sensitivity:</label>
-        <input type="range" id="sensitivity" min="10" max="100" value="30">
-        <span id="sens-val" style="color: #10b981;">30</span>
-        <button onclick="clearGallery()" style="padding: 8px 15px; background: #555; color: white; border: none; border-radius: 4px; cursor: pointer;">Clear Gallery</button>
+    <div class="controls-panel">
+        <div class="slider-group">
+            <label>Sensitivity</label>
+            <input type="range" id="sensitivity" min="10" max="100" value="35">
+            <span id="sens-val" style="color: var(--primary-purple); font-weight: 800; font-size: 0.8rem;">35</span>
+        </div>
+        <button class="btn-clear" onclick="clearGallery()">Purge Logs</button>
     </div>
 
-    <h3>Intruder Log:</h3>
-    <div class="gallery" id="gallery">
-        <p style="color: #777; width: 100%; text-align: center;">No motion detected yet...</p>
+    <div class="log-section">
+        <div class="log-header">Intrusion Evidence</div>
+        <div class="gallery" id="gallery">
+            <p style="color: #64748b; width: 100%; text-align: center; font-size: 0.75rem;">Standby... No activity logged.</p>
+        </div>
     </div>
 
     <script>
@@ -64,48 +125,48 @@
         const sensVal = document.getElementById('sens-val');
 
         let lastFrameData = null;
-        let motionTimeout = null;
-        let isCoolingDown = false; // To prevent spamming photos
+        let isCoolingDown = false;
 
-        // Start Camera
-        navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+        // Camera Access
+        navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } }).then(stream => {
             video.srcObject = stream;
-            // Loop for detection
-            setInterval(detectMotion, 100); // Check every 100ms
+            setInterval(detectMotion, 100); 
+        }).catch(err => {
+            badge.innerText = "ACCESS DENIED";
+            badge.style.color = "var(--error-red)";
         });
 
         sensitivityInput.oninput = () => { sensVal.innerText = sensitivityInput.value; };
 
         function detectMotion() {
-            // Draw current video frame to hidden canvas
+            if (video.paused || video.ended) return;
+
             ctx.drawImage(video, 0, 0, 640, 480);
             const frameData = ctx.getImageData(0, 0, 640, 480);
             
-            // If first frame, just save it
             if (!lastFrameData) {
                 lastFrameData = frameData;
                 return;
             }
 
-            // Compare pixels
             const length = frameData.data.length;
             let diffScore = 0;
-            const threshold = 30; // Pixel color difference threshold
+            const pixelThreshold = 35; 
 
-            // Loop through pixels (step by 4 for speed)
-            for (let i = 0; i < length; i += 4 * 10) { // Check every 10th pixel for performance
+            // High performance skip loop
+            for (let i = 0; i < length; i += 4 * 15) { 
                 const rDiff = Math.abs(frameData.data[i] - lastFrameData.data[i]);
                 const gDiff = Math.abs(frameData.data[i+1] - lastFrameData.data[i+1]);
                 const bDiff = Math.abs(frameData.data[i+2] - lastFrameData.data[i+2]);
                 
-                if (rDiff + gDiff + bDiff > threshold) {
+                if (rDiff + gDiff + bDiff > pixelThreshold) {
                     diffScore++;
                 }
             }
 
-            // Update status
-            const sensitivity = 110 - sensitivityInput.value; // Lower value = higher sensitivity in input
-            const triggerLevel = sensitivity * 10; 
+            // UI Sensitivity Logic
+            const sensitivity = 110 - sensitivityInput.value; 
+            const triggerLevel = sensitivity * 8; 
 
             if (diffScore > triggerLevel) {
                 triggerAlert();
@@ -122,51 +183,49 @@
             setStatus('recording');
             takePhoto();
 
-            // Cooldown for 2 seconds before next photo
             isCoolingDown = true;
             setTimeout(() => {
                 isCoolingDown = false;
                 setStatus('watching');
-            }, 2000);
+            }, 2500);
         }
 
         function setStatus(state) {
             if (state === 'recording') {
                 badge.className = 'status-badge recording';
-                badge.innerText = "⚠ MOTION DETECTED";
+                badge.innerText = "⚠ INTRUSION DETECTED";
             } else {
                 badge.className = 'status-badge watching';
-                badge.innerText = "ARMED & WATCHING";
+                badge.innerText = "SYSTEM ARMED";
             }
         }
 
         function takePhoto() {
-            // Create a small canvas for the snapshot
             const snapCanvas = document.createElement('canvas');
             snapCanvas.width = 320;
             snapCanvas.height = 240;
             const snapCtx = snapCanvas.getContext('2d');
+            
+            // Mirror flip for gallery as well
+            snapCtx.translate(320, 0);
+            snapCtx.scale(-1, 1);
             snapCtx.drawImage(video, 0, 0, 320, 240);
             
-            // Create Image Element
             const img = document.createElement('img');
             img.src = snapCanvas.toDataURL('image/jpeg');
             img.className = 'snap';
             
-            // Add to gallery
             const emptyMsg = gallery.querySelector('p');
             if(emptyMsg) emptyMsg.remove();
             
             gallery.prepend(img);
-            
-            // Keep gallery clean (max 10 photos)
-            if(gallery.children.length > 10) {
+            if(gallery.children.length > 12) {
                 gallery.lastElementChild.remove();
             }
         }
 
         function clearGallery() {
-            gallery.innerHTML = '<p style="color: #777; width: 100%; text-align: center;">No motion detected yet...</p>';
+            gallery.innerHTML = '<p style="color: #64748b; width: 100%; text-align: center; font-size: 0.75rem;">Standby... No activity logged.</p>';
         }
     </script>
 </body>
