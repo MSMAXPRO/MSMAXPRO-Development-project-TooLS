@@ -2,79 +2,239 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Local PDF Master</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Master Pro - CodeWithMsMaxPro</title>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <style>
-        body { background: #525659; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; color: white; }
-        .header { margin: 20px; text-align: center; }
-        .container { width: 600px; background: #323639; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        
-        .drop-zone {
-            border: 2px dashed #777; padding: 40px; text-align: center; border-radius: 5px; cursor: pointer; transition: 0.3s; background: #2a2d30;
+        /* Website Theme Variables */
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --primary-purple: #8b5cf6;
+            --text-white: #f8fafc;
+            --accent-glow: rgba(139, 92, 246, 0.4);
+            --success-green: #10b981;
+            --error-red: #f43f5e;
         }
-        .drop-zone:hover { border-color: #ff4757; background: #3a3d40; }
-        
-        .file-list { margin-top: 20px; list-style: none; padding: 0; }
-        .file-item {
-            background: #444; padding: 10px; margin-bottom: 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;
-        }
-        .file-name { font-size: 0.9rem; max-width: 400px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-        
-        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
-        .btn-remove { background: #ff4757; font-size: 0.8rem; }
-        .btn-action { background: #2ed573; width: 100%; font-size: 1.1rem; padding: 15px; margin-top: 20px; }
-        .btn-action:hover { background: #26af61; }
-        .btn-action:disabled { background: #555; cursor: not-allowed; }
 
-        .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; display: none; margin-left: 10px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 35px 35px;
+            color: var(--text-white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 30px 15px;
+        }
+
+        .header-box {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .web-link {
+            color: var(--primary-purple);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .drop-zone {
+            border: 2px dashed rgba(139, 92, 246, 0.3);
+            padding: 40px;
+            text-align: center;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            background: rgba(15, 23, 42, 0.5);
+            margin-bottom: 25px;
+        }
+
+        .drop-zone:hover {
+            border-color: var(--primary-purple);
+            background: rgba(139, 92, 246, 0.05);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
+        }
+
+        .drop-zone h3 {
+            font-size: 1.1rem;
+            color: var(--primary-purple);
+            margin-bottom: 8px;
+        }
+
+        .file-list {
+            margin-top: 20px;
+            list-style: none;
+            padding: 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 12px 18px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .file-name {
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            max-width: 80%;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .btn-remove {
+            background: transparent;
+            color: var(--error-red);
+            border: 1px solid var(--error-red);
+            padding: 4px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: 0.2s;
+        }
+
+        .btn-remove:hover {
+            background: var(--error-red);
+            color: white;
+        }
+
+        .btn-action {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary-purple);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-action:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--accent-glow);
+            filter: brightness(1.1);
+        }
+
+        .btn-action:disabled {
+            background: #334155;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        .privacy-note {
+            margin-top: 20px;
+            font-size: 0.7rem;
+            color: #64748b;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>📑 PDF Master</h1>
-        <p style="color: #bbb;">Merge PDFs securely. No server upload.</p>
+    <div class="header-box">
+        <h1>PDF Master Pro</h1>
+        <a href="https://codewithmsmaxpro.me" class="web-link">codewithmsmaxpro.me</a>
     </div>
 
     <div class="container">
-        <div class="drop-zone" onclick="document.getElementById('fileIn').click()">
-            <h3>Click to Select PDFs</h3>
-            <p style="color:#888">or Drag & Drop here</p>
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileIn').click()">
+            <h3>SELECT PDF FILES</h3>
+            <p style="color:#94a3b8; font-size: 0.8rem;">Click or Drag & Drop Here</p>
             <input type="file" id="fileIn" accept="application/pdf" multiple style="display: none">
         </div>
 
         <ul class="file-list" id="fileList"></ul>
 
-        <button class="btn btn-action" id="mergeBtn" onclick="mergePDFs()" disabled>
-            MERGE PDFS <div class="spinner" id="spinner"></div>
+        <button class="btn-action" id="mergeBtn" onclick="mergePDFs()" disabled>
+            MERGE DOCUMENTS <div class="spinner" id="spinner"></div>
         </button>
+
+        <p class="privacy-note">🔒 Local Processing: Your files never leave your device.</p>
     </div>
 
     <script>
         const fileIn = document.getElementById('fileIn');
         const fileList = document.getElementById('fileList');
         const mergeBtn = document.getElementById('mergeBtn');
+        const spinner = document.getElementById('spinner');
+        const dropZone = document.getElementById('dropZone');
         let filesArray = [];
 
-        fileIn.addEventListener('change', (e) => {
-            handleFiles(e.target.files);
-        });
+        fileIn.addEventListener('change', (e) => handleFiles(e.target.files));
 
-        // Drag and Drop Logic
-        const dropZone = document.querySelector('.drop-zone');
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#ff4757'; });
-        dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.style.borderColor = '#777'; });
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--primary-purple)'; });
+        dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.style.borderColor = 'rgba(139, 92, 246, 0.3)'; });
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
-            dropZone.style.borderColor = '#777';
+            dropZone.style.borderColor = 'rgba(139, 92, 246, 0.3)';
             handleFiles(e.dataTransfer.files);
         });
 
         async function handleFiles(files) {
             for (let file of files) {
                 if (file.type === 'application/pdf') {
-                    // Convert file to ArrayBuffer immediately for processing later
                     const arrayBuffer = await file.arrayBuffer();
                     filesArray.push({ name: file.name, data: arrayBuffer });
                 }
@@ -89,12 +249,16 @@
                 li.className = 'file-item';
                 li.innerHTML = `
                     <span class="file-name">📄 ${file.name}</span>
-                    <button class="btn btn-remove" onclick="removeFile(${index})">✕</button>
+                    <button class="btn-remove" onclick="removeFile(${index})">REMOVE</button>
                 `;
                 fileList.appendChild(li);
             });
             mergeBtn.disabled = filesArray.length < 2;
-            mergeBtn.innerHTML = filesArray.length < 2 ? "Select at least 2 PDFs" : "MERGE PDFS";
+            if (filesArray.length < 2) {
+                mergeBtn.innerHTML = `Add ${2 - filesArray.length} more PDF(s)`;
+            } else {
+                mergeBtn.innerHTML = 'MERGE DOCUMENTS <div class="spinner" id="spinner" style="display:inline-block"></div>';
+            }
         }
 
         function removeFile(index) {
@@ -103,11 +267,10 @@
         }
 
         async function mergePDFs() {
-            const spinner = document.createElement('div');
-            spinner.className = 'spinner';
-            spinner.style.display = 'inline-block';
+            const spin = document.getElementById('spinner');
+            spin.style.display = 'inline-block';
             mergeBtn.innerHTML = "Processing...";
-            mergeBtn.appendChild(spinner);
+            mergeBtn.appendChild(spin);
             mergeBtn.disabled = true;
 
             try {
@@ -121,12 +284,12 @@
                 }
 
                 const pdfBytes = await mergedPdf.save();
-                download(pdfBytes, "merged_document.pdf", "application/pdf");
+                download(pdfBytes, "MSMAXPRO_Merged.pdf", "application/pdf");
                 
-                mergeBtn.innerHTML = "Success! Downloading...";
+                mergeBtn.innerHTML = "DOWNLOAD SUCCESSFUL!";
                 setTimeout(() => { renderList(); }, 2000);
             } catch (err) {
-                alert("Error merging PDFs: " + err);
+                alert("Critical Error: " + err);
                 renderList();
             }
         }
