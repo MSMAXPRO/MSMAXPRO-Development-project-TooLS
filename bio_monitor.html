@@ -2,64 +2,209 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Bio-Metric Pulse Scanner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bio-Metric Pulse Scanner - CodeWithMsMaxPro</title>
     <style>
-        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; margin: 0; min-height: 100vh; }
-        
+        /* Website Theme Variables */
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --primary-purple: #8b5cf6;
+            --text-white: #f8fafc;
+            --accent-glow: rgba(139, 92, 246, 0.4);
+            --error-red: #f43f5e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 35px 35px;
+            color: var(--text-white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .web-link {
+            color: var(--primary-purple);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .main-scanner-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
         .monitor-frame {
-            position: relative; border: 2px solid #005500; margin-top: 20px; width: 320px; height: 240px; overflow: hidden;
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid var(--primary-purple);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+            margin-bottom: 20px;
         }
         
-        video { position: absolute; left: 0; top: 0; opacity: 0.8; filter: contrast(1.2) brightness(1.2); transform: scaleX(-1); }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.7;
+            transform: scaleX(-1);
+        }
         
         .overlay-roi {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 100px; height: 100px; border: 2px solid #0f0; box-shadow: 0 0 10px #0f0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            border: 2px dashed var(--primary-purple);
             border-radius: 50%;
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .bpm-display {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 10px 20px;
+            border-radius: 15px;
+            border: 1px solid var(--accent-glow);
+        }
+
+        .bpm-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-purple);
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .label {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            display: block;
         }
 
         .graph-container {
-            width: 90%; max-width: 600px; height: 150px; background: #001100; border: 1px solid #003300; margin-top: 20px; position: relative;
+            width: 100%;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
         
-        canvas { display: block; width: 100%; height: 100%; }
+        canvas { width: 100%; height: 100%; }
 
-        .stats {
-            display: flex; gap: 40px; margin-top: 20px; font-size: 2rem; font-weight: bold; text-shadow: 0 0 10px #0f0;
+        .status-bar {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary-purple);
+            letter-spacing: 1px;
         }
-        
-        .bpm-box { text-align: center; }
-        .bpm-label { font-size: 0.8rem; opacity: 0.7; display: block; }
 
-        .status { margin-top: 10px; color: #008800; animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0.5; } }
+        .instructions {
+            margin-top: 20px;
+            font-size: 0.75rem;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        /* Scanline effect for video */
+        .scanline {
+            width: 100%;
+            height: 2px;
+            background: rgba(139, 92, 246, 0.3);
+            position: absolute;
+            z-index: 5;
+            animation: scan 3s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
     </style>
 </head>
 <body>
 
-    <h2 style="margin-bottom: 5px;">BIO-METRIC SCANNER</h2>
-    <div class="status" id="status">INITIALIZING SENSORS...</div>
-
-    <div class="monitor-frame">
-        <video id="video" width="320" height="240" autoplay muted playsinline></video>
-        <div class="overlay-roi"></div>
+    <div class="header">
+        <h1>Pulse Scanner</h1>
+        <a href="https://codewithmsmaxpro.me" class="web-link">codewithmsmaxpro.me</a>
     </div>
 
-    <div class="stats">
-        <div class="bpm-box">
-            <span id="bpm">--</span>
-            <span class="bpm-label">BPM (Live)</span>
+    <div class="main-scanner-card">
+        <div id="status" class="status-bar">SYSTEM INITIALIZING...</div>
+        
+        <div class="monitor-frame">
+            <div class="scanline"></div>
+            <video id="video" autoplay muted playsinline></video>
+            <div class="overlay-roi"></div>
+        </div>
+
+        <div class="stats-row">
+            <div class="bpm-display">
+                <span class="bpm-value" id="bpm">--</span>
+                <span class="label">Beats Per Minute</span>
+            </div>
+        </div>
+
+        <div class="graph-container">
+            <canvas id="graph"></canvas>
+        </div>
+
+        <div class="instructions">
+            <b>GUIDE:</b> Place your face in the target circle. Maintain silence and stay still for 10 seconds.
         </div>
     </div>
-
-    <div class="graph-container">
-        <canvas id="graph"></canvas>
-    </div>
-
-    <p style="color: #005500; font-size: 0.8rem; text-align: center; max-width: 500px;">
-        INSTRUCTIONS: Place face in circle. Stay very still. Good lighting required.<br>
-        Calculating subtle blood-flow color changes...
-    </p>
 
     <script>
         const video = document.getElementById('video');
@@ -68,23 +213,20 @@
         const bpmDisplay = document.getElementById('bpm');
         const statusDisplay = document.getElementById('status');
         
-        // Settings
-        const ROI_SIZE = 50; // Region of Interest (Forehead)
-        const SAMPLE_BUFFER_SIZE = 150; // Keep last 150 frames
+        const ROI_SIZE = 50; 
+        const SAMPLE_BUFFER_SIZE = 150; 
         
         let brightnessBuffer = [];
         let times = [];
         let canvasCtx = null;
-        let lastTime = Date.now();
         let frameCount = 0;
 
-        // Start Camera
-        navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240, facingMode: 'user' } })
+        // Camera Access
+        navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480, facingMode: 'user' } })
             .then(stream => {
                 video.srcObject = stream;
-                statusDisplay.innerText = "SENSOR ACTIVE - ACQUIRING SIGNAL";
+                statusDisplay.innerText = "SENSOR ONLINE - CALIBRATING";
                 
-                // Create a hidden canvas to read pixels
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = 320;
                 tempCanvas.height = 240;
@@ -93,23 +235,22 @@
                 requestAnimationFrame(processFrame);
             })
             .catch(err => {
-                statusDisplay.innerText = "CAMERA ACCESS DENIED";
-                statusDisplay.style.color = "red";
+                statusDisplay.innerText = "HARDWARE NOT FOUND";
+                statusDisplay.style.color = "var(--error-red)";
             });
 
         function processFrame() {
-            if (!canvasCtx) return;
+            if (!canvasCtx || video.paused || video.ended) return;
 
-            // Draw video frame to hidden canvas
             canvasCtx.drawImage(video, 0, 0, 320, 240);
             
-            // Get center pixels (Green Channel is best for blood flow)
+            // Analyze Green Channel (Hemoglobin absorption is highest here)
             const frame = canvasCtx.getImageData((320/2)-(ROI_SIZE/2), (240/2)-(ROI_SIZE/2), ROI_SIZE, ROI_SIZE);
             const data = frame.data;
             
             let avgGreen = 0;
             for (let i = 0; i < data.length; i += 4) {
-                avgGreen += data[i + 1]; // Green channel
+                avgGreen += data[i + 1]; 
             }
             avgGreen /= (data.length / 4);
 
@@ -124,8 +265,7 @@
 
             drawGraph();
             
-            // Calculate BPM every 30 frames
-            if (frameCount % 10 === 0 && brightnessBuffer.length > 60) {
+            if (frameCount % 15 === 0 && brightnessBuffer.length > 80) {
                 calculateBPM();
             }
             
@@ -134,15 +274,13 @@
         }
 
         function calculateBPM() {
-            // Signal Processing: Simple Peak Detection
-            // 1. Normalize
             const min = Math.min(...brightnessBuffer);
             const max = Math.max(...brightnessBuffer);
-            const normalized = brightnessBuffer.map(v => (v - min) / (max - min));
+            const normalized = brightnessBuffer.map(v => (v - min) / (max - min || 1));
             
-            // 2. Smooth (Moving Average)
+            // Noise reduction (Moving Average)
             const smoothed = [];
-            const windowSize = 5;
+            const windowSize = 4;
             for(let i=0; i<normalized.length; i++) {
                 let sum = 0, count = 0;
                 for(let j=Math.max(0, i-windowSize); j<Math.min(normalized.length, i+windowSize); j++) {
@@ -152,28 +290,24 @@
                 smoothed.push(sum/count);
             }
 
-            // 3. Count Peaks
-            let peaks = 0;
-            let lastPeakTime = 0;
-            let intervals = [];
-
-            for (let i = 1; i < smoothed.length - 1; i++) {
-                if (smoothed[i] > smoothed[i-1] && smoothed[i] > smoothed[i+1] && smoothed[i] > 0.5) {
-                    if (lastPeakTime > 0) {
-                        intervals.push(times[i] - lastPeakTime);
-                    }
-                    lastPeakTime = times[i];
-                    peaks++;
+            let peaks = [];
+            for (let i = 2; i < smoothed.length - 2; i++) {
+                if (smoothed[i] > smoothed[i-1] && smoothed[i] > smoothed[i+1] && smoothed[i] > 0.6) {
+                    peaks.push(times[i]);
                 }
             }
             
-            if (intervals.length > 2) {
+            if (peaks.length >= 3) {
+                let intervals = [];
+                for(let i=1; i<peaks.length; i++) {
+                    intervals.push(peaks[i] - peaks[i-1]);
+                }
                 const avgInterval = intervals.reduce((a,b) => a+b, 0) / intervals.length;
                 const bpm = Math.round(60000 / avgInterval);
                 
-                if(bpm > 40 && bpm < 180) {
+                if(bpm > 45 && bpm < 160) {
                     bpmDisplay.innerText = bpm;
-                    statusDisplay.innerText = "PULSE DETECTED";
+                    statusDisplay.innerText = "SIGNAL STABLE - ANALYZING";
                 }
             }
         }
@@ -182,8 +316,11 @@
             graphCanvas.width = graphCanvas.offsetWidth;
             graphCanvas.height = graphCanvas.offsetHeight;
             
-            ctx.strokeStyle = '#00ff00';
-            ctx.lineWidth = 2;
+            ctx.clearRect(0,0, graphCanvas.width, graphCanvas.height);
+            ctx.strokeStyle = '#8b5cf6';
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#8b5cf6';
             ctx.beginPath();
             
             const min = Math.min(...brightnessBuffer);
@@ -192,7 +329,7 @@
             
             for (let i = 0; i < brightnessBuffer.length; i++) {
                 const x = (i / SAMPLE_BUFFER_SIZE) * graphCanvas.width;
-                const y = graphCanvas.height - ((brightnessBuffer[i] - min) / range) * graphCanvas.height;
+                const y = graphCanvas.height - ((brightnessBuffer[i] - min) / range) * (graphCanvas.height * 0.8) - 10;
                 
                 if (i === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
