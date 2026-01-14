@@ -2,108 +2,180 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Speed Typer Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Typer - CodeWithMsMaxPro</title>
     <style>
+        /* Website Theme Variables */
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --primary-purple: #8b5cf6;
+            --text-white: #f8fafc;
+            --accent-glow: rgba(139, 92, 246, 0.4);
+            --correct-green: #4ade80;
+            --error-red: #f87171;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Courier New', monospace;
+        }
+
         body {
-            background: #232323;
-            color: #eee;
-            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.03) 1px, transparent 0);
+            background-size: 40px 40px;
+            color: var(--text-white);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            margin: 0;
+            padding: 20px;
+        }
+
+        .header-box {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .web-link {
+            color: var(--primary-purple);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
         }
 
         .container {
-            width: 80%;
+            width: 100%;
             max-width: 800px;
-            background: #333;
+            background: var(--card-bg);
             padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
         .stats {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            background: #444;
-            padding: 15px;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 1.2rem;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid var(--accent-glow);
         }
 
-        .stat-box span { color: #facc15; }
+        .stat-box {
+            font-weight: 800;
+            font-size: 1rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-box span { 
+            color: var(--primary-purple); 
+            font-size: 1.4rem;
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
 
         #quote-display {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
+            font-size: 1.4rem;
+            margin-bottom: 25px;
             line-height: 1.6;
-            word-spacing: 5px;
+            color: #cbd5e1;
+            min-height: 100px;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
         }
 
         textarea {
             width: 100%;
-            height: 150px;
-            background: #222;
-            border: 2px solid #555;
+            height: 120px;
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             color: white;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             padding: 15px;
-            border-radius: 10px;
+            border-radius: 12px;
             resize: none;
             outline: none;
-            font-family: inherit;
+            transition: 0.3s;
         }
 
-        textarea:focus { border-color: #facc15; }
+        textarea:focus { 
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
 
-        /* Coloring spans for correct/incorrect */
-        .correct { color: #4ade80; }
-        .incorrect { color: #ef4444; text-decoration: underline; }
+        .correct { color: var(--correct-green); }
+        .incorrect { color: var(--error-red); background: rgba(248, 113, 113, 0.2); border-radius: 2px; }
         
         button {
-            margin-top: 20px;
-            padding: 10px 25px;
-            background: #facc15;
+            margin-top: 25px;
+            padding: 14px 40px;
+            background: var(--primary-purple);
             border: none;
-            font-weight: bold;
+            color: white;
+            font-weight: 800;
             cursor: pointer;
-            border-radius: 5px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
         }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--accent-glow);
+        }
+
+        button:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
 
+    <div class="header-box">
+        <h1>MSMAXPRO Speed Typer</h1>
+        <a href="https://codewithmsmaxpro.me" class="web-link">codewithmsmaxpro.me</a>
+    </div>
+
     <div class="container">
-        <h1 style="text-align:center; color: #facc15;">SPEED TYPER</h1>
-        
         <div class="stats">
             <div class="stat-box">Time: <span id="timer">60</span>s</div>
             <div class="stat-box">WPM: <span id="wpm">0</span></div>
-            <div class="stat-box">Accuracy: <span id="accuracy">100</span>%</div>
+            <div class="stat-box">Acc: <span id="accuracy">100</span>%</div>
         </div>
 
-        <div id="quote-display">Click Start to begin...</div>
+        <div id="quote-display">Initializing interface... Click Restart to begin.</div>
         
-        <textarea id="quote-input" placeholder="Start typing here..." disabled></textarea>
+        <textarea id="quote-input" placeholder="Neural link standby... type to begin mission." disabled></textarea>
         
         <div style="text-align: center;">
-            <button onclick="startGame()">Restart Test</button>
+            <button onclick="startGame()">Initiate Test</button>
         </div>
     </div>
 
     <script>
         const RANDOM_QUOTES = [
-            "The quick brown fox jumps over the lazy dog.",
-            "To be or not to be, that is the question.",
-            "Coding is not just about logic, it is about art and creativity.",
-            "Success is stumbling from failure to failure with no loss of enthusiasm.",
-            "In the middle of difficulty lies opportunity.",
-            "Python is great but JavaScript makes the web come alive."
+            "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+            "The only way to do great work is to love what you do.",
+            "Technology is best when it brings people together.",
+            "JavaScript is the language of the web, turning static pages into dynamic experiences.",
+            "Stay hungry, stay foolish. Innovation distinguishes between a leader and a follower.",
+            "In a world of algorithms, never lose the human touch in your code."
         ];
 
         const quoteDisplay = document.getElementById('quote-display');
@@ -115,7 +187,6 @@
         let timer = 60;
         let timerInterval = null;
         let started = false;
-        let currentQuote = "";
 
         quoteInput.addEventListener('input', () => {
             if (!started) return;
@@ -129,8 +200,7 @@
             arrayQuote.forEach((characterSpan, index) => {
                 const character = arrayValue[index];
                 if (character == null) {
-                    characterSpan.classList.remove('correct');
-                    characterSpan.classList.remove('incorrect');
+                    characterSpan.classList.remove('correct', 'incorrect');
                     allCorrect = false;
                 } else if (character === characterSpan.innerText) {
                     characterSpan.classList.add('correct');
@@ -148,10 +218,8 @@
             let accuracy = totalTyped > 0 ? Math.round((correctChars / totalTyped) * 100) : 100;
             accElement.innerText = accuracy;
 
-            // WPM = (Characters / 5) / Time Elapsed (in mins)
             let timeElapsed = 60 - timer;
             if (timeElapsed > 0) {
-                 // Prevent infinity
                 let wpm = Math.round((correctChars / 5) / (timeElapsed / 60));
                 wpmElement.innerText = wpm;
             }
@@ -162,19 +230,14 @@
             }
         });
 
-        function getRandomQuote() {
-            return RANDOM_QUOTES[Math.floor(Math.random() * RANDOM_QUOTES.length)];
-        }
-
         function renderNewQuote() {
-            currentQuote = getRandomQuote();
+            const quote = RANDOM_QUOTES[Math.floor(Math.random() * RANDOM_QUOTES.length)];
             quoteDisplay.innerHTML = '';
-            currentQuote.split('').forEach(character => {
+            quote.split('').forEach(character => {
                 const characterSpan = document.createElement('span');
                 characterSpan.innerText = character;
                 quoteDisplay.appendChild(characterSpan);
             });
-            quoteInput.value = null;
         }
 
         function startGame() {
@@ -194,9 +257,7 @@
             timerInterval = setInterval(() => {
                 timer--;
                 timerElement.innerText = timer;
-                if (timer <= 0) {
-                    endGame();
-                }
+                if (timer <= 0) endGame();
             }, 1000);
         }
 
@@ -204,7 +265,7 @@
             clearInterval(timerInterval);
             started = false;
             quoteInput.disabled = true;
-            quoteDisplay.innerText = "Time's up! Check your WPM above.";
+            quoteDisplay.innerText = "Mission Complete. Analyze your stats above.";
         }
     </script>
 </body>
