@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSMAXPRO Development Tools</title>
+    <style>
+        :root {
+            --primary-color: #0ea5e9; /* Sky Blue */
+            --primary-hover: #0284c7;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --card-bg: #ffffff;
+            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --header-bg: #ffffff;
+            --transition-speed: 0.3s;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --text-color: #f1f5f9;
+            --card-bg: #1e293b;
+            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.5);
+            --header-bg: #1e293b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--header-bg);
+            padding: 1rem 2rem;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background-color var(--transition-speed);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Toggle Switch */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .theme-switch {
+            display: inline-block;
+            height: 34px;
+            position: relative;
+            width: 60px;
+        }
+
+        .theme-switch input {
+            display: none;
+        }
+
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            background-color: #fff;
+            bottom: 4px;
+            content: "";
+            height: 26px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 26px;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .intro {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .intro h1 {
+            margin-bottom: 0.5rem;
+        }
+
+        .intro p {
+            opacity: 0.8;
+        }
+
+        /* Grid Layout */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s, box-shadow 0.2s, background-color var(--transition-speed);
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border: 1px solid transparent;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05);
+            border-color: var(--primary-color);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: rgba(14, 165, 233, 0.1);
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: var(--primary-color);
+        }
+
+        .card h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <span>🛠️</span> MSMAXPRO Tools
+        </div>
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="slider"></div>
+            </label>
+            <span style="margin-left: 10px; font-size: 0.9rem;">🌓 Mode</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="intro">
+            <h1>Welcome to the Dashboard</h1>
+            <p>Select a tool to get started. Explore utilities, concepts, and experiments.</p>
+        </div>
+
+        <div class="tools-grid" id="toolsGrid">
+            </div>
+    </div>
+
+    <footer>
+        <p>Created by <a href="https://github.com/MSMAXPRO" target="_blank">MSMAXPRO</a></p>
+    </footer>
+
+    <script>
+        // Tools Data based on repository files
+        const tools = [
+            { name: "Analog Clock", file: "analog_clock.html", icon: "🕒", desc: "Real-time analog clock UI" },
+            { name: "Bio Monitor", file: "bio_monitor.html", icon: "❤️", desc: "Health monitoring UI concept" },
+            { name: "BMI Calculator", file: "bmi_calculator.html", icon: "⚖️", desc: "Calculate your Body Mass Index" },
+            { name: "Basic Calculator", file: "calculator.html", icon: "➕", desc: "Simple arithmetic operations" },
+            { name: "Digital Canvas", file: "digital_canvas.html", icon: "🖌️", desc: "Drawing and sketching playground" },
+            { name: "Expense Tracker", file: "expanse_tracker.html", icon: "💰", desc: "Track your daily expenses" },
+            { name: "Focus Timer", file: "focus_timer.html", icon: "⏲️", desc: "Pomodoro-style focus timer" },
+            { name: "Ghost Touch", file: "ghost_touch.html", icon: "👆", desc: "Touch interaction testing tool" },
+            { name: "Image Text Copy", file: "image_text_copy.html", icon: "🖼️", desc: "Extract text from images" },
+            { name: "JARVIS AI", file: "jarvis_ai.html", icon: "🤖", desc: "Frontend AI assistant concept" },
+            { name: "Motion Cam", file: "motion_cam.html", icon: "📸", desc: "Camera and motion experiment" },
+            { name: "Neon Clock", file: "neon_digital_clock..html", icon: "💡", desc: "Stylish digital clock interface" },
+            { name: "Pathfinding Visualizer", file: "patfinding_visualizer.html", icon: "🧭", desc: "Algorithm visualization tool" },
+            { name: "PDF Master", file: "pdf_master.html", icon: "📑", desc: "PDF utility interface concept" },
+            { name: "Physics Sandbox", file: "physics_sandbox.html", icon: "⚛️", desc: "Physics-based interaction demo" },
+            { name: "Password Vault", file: "secure_password_vault.html", icon: "🔐", desc: "Secure password storage demo" },
+            { name: "Text to Speech", file: "text_to_speech.html", icon: "🗣️", desc: "Convert text to spoken words" },
+            { name: "To-Do List", file: "to_do_list.html", icon: "✅", desc: "Manage your tasks simply" },
+            { name: "Typing Speed", file: "typing_speed_check.html", icon: "⌨️", desc: "Test your typing speed" },
+            { name: "Virtual Drums", file: "virtual_drum_kit.html", icon: "🥁", desc: "Play drums in your browser" }
+        ];
+
+        const grid = document.getElementById('toolsGrid');
+
+        // Render Cards
+        tools.forEach(tool => {
+            const card = document.createElement('a');
+            card.href = tool.file;
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="card-icon">${tool.icon}</div>
+                <h3>${tool.name}</h3>
+                <p>${tool.desc}</p>
+            `;
+            grid.appendChild(card);
+        });
+
+        // Theme Toggle Logic
+        const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+        const currentTheme = localStorage.getItem('theme');
+
+        if (currentTheme) {
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            if (currentTheme === 'dark') {
+                toggleSwitch.checked = true;
+            }
+        }
+
+        function switchTheme(e) {
+            if (e.target.checked) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        toggleSwitch.addEventListener('change', switchTheme, false);
+    </script>
+</body>
+</html>
